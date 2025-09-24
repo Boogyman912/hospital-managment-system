@@ -1,0 +1,36 @@
+package com.hms.hospital_management_system.services;
+import com.hms.hospital_management_system.models.Patient;
+import java.util.List;
+import org.springframework.stereotype.Service;
+
+//In service layer we write the business logic
+//@Service annotation is used to mark the class as a service provider
+// It is a specialization of the @Component annotation
+// It is used to indicate that the class provides some business functionalities
+// It is used to separate the business logic from the controller layer
+// It interfaces with the repository layer to fetch and save data
+@Service
+public class PatientService {
+    
+    public void createPatient(Patient patient) {
+        // logic to create a new patient
+        try {
+
+           System.out.println("Create a new patient");
+        } catch (Exception e) {
+            System.out.println( "Error: " + e.getMessage());
+        }
+    }
+
+
+    public List<Patient> getAllPatients() {
+        // logic to get all patients
+        try {
+
+           System.out.println("Get all patients");
+        }catch(Exception e) {
+            System.out.println( "Error: " + e.getMessage());
+        }
+        return null;
+    }
+}
