@@ -3,7 +3,7 @@ package com.hms.hospital_management_system.models;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-
+import com.hms.hospital_management_system.models.Appointment;
 
 @Entity
 @Table(name = "lab_tests")
@@ -13,30 +13,27 @@ public class LabTest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long testId;
 
-    @ManyToOne
-    @JoinColumn(name = "patient_id")
-    private Patient patient;
+    // @ManyToOne
+    // @JoinColumn(name = "appointment_id")
+    // private Appointment  appointment;
+    // @ManyToOne
+    // @JoinColumn(name = "patient_id")
+    // private Patient patient;
 
-    private String testType;
+    private String testName;
 
-    private LocalDate dateBooked;
+    private String testType; // e.g., Blood Test, X-Ray, MRI
 
-    private String resultUrl;
-
-    @Enumerated(EnumType.STRING)
-    private LabTestStatus status;
-
-    public enum LabTestStatus { PENDING, COMPLETED, CANCELLED }
+    private Double testCost;
 
     public LabTest() {
     }
 
-    public LabTest(Patient patient, String testType, LocalDate dateBooked, String resultUrl, LabTestStatus status) {
-        this.patient = patient;
+    public LabTest(Long testId, String testName, String testType, Double testCost) {
+        this.testId = testId;
+        this.testName = testName;
         this.testType = testType;
-        this.dateBooked = dateBooked;
-        this.resultUrl = resultUrl;
-        this.status = status;
+        this.testCost = testCost;
     }
 
     public Long getTestId() {
@@ -47,12 +44,12 @@ public class LabTest {
         this.testId = testId;
     }
 
-    public Patient getPatient() {
-        return patient;
+    public String getTestName() {
+        return testName;
     }
 
-    public void setPatient(Patient patient) {
-        this.patient = patient;
+    public void setTestName(String testName) {
+        this.testName = testName;
     }
 
     public String getTestType() {
@@ -63,27 +60,12 @@ public class LabTest {
         this.testType = testType;
     }
 
-    public LocalDate getDateBooked() {
-        return dateBooked;
+    public Double getTestCost() {
+        return testCost;
     }
 
-    public void setDateBooked(LocalDate dateBooked) {
-        this.dateBooked = dateBooked;
+    public void setTestCost(Double testCost) {
+        this.testCost = testCost;
     }
 
-    public String getResultUrl() {
-        return resultUrl;
-    }
-
-    public void setResultUrl(String resultUrl) {
-        this.resultUrl = resultUrl;
-    }
-
-    public LabTestStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(LabTestStatus status) {
-        this.status = status;
-    }
 }

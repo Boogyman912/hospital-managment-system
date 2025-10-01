@@ -3,7 +3,6 @@ package com.hms.hospital_management_system.models;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import com.hms.hospital_management_system.models.Staff;
 
 @Entity
 @Table(name = "slots")
@@ -15,7 +14,7 @@ public class Slot {
 
     @ManyToOne
     @JoinColumn(name = "doctor_id", nullable = false)
-    private Staff doctor;
+    private Doctor doctor;
 
     private LocalDate date;
 
@@ -35,7 +34,7 @@ public class Slot {
     public Slot() {
     }
 
-    public Slot(Staff doctor, LocalDate date, String time, Boolean isOnline, SlotStatus status, LocalDateTime heldUntil) {
+    public Slot(Doctor doctor, LocalDate date, String time, Boolean isOnline, SlotStatus status, LocalDateTime heldUntil) {
         this.doctor = doctor;
         this.date = date;
         this.time = time;
@@ -52,11 +51,11 @@ public class Slot {
         this.slotId = slotId;
     }
 
-    public Staff getDoctor() {
+    public Doctor getDoctor() {
         return doctor;
     }
 
-    public void setDoctor(Staff doctor) {
+    public void setDoctor(Doctor doctor) {
         this.doctor = doctor;
     }
 

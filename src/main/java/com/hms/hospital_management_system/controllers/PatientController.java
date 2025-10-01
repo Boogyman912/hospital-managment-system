@@ -1,10 +1,7 @@
 package com.hms.hospital_management_system.controllers;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import com.hms.hospital_management_system.models.Patient;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,15 +15,28 @@ public class PatientController {
     private PatientService patientService;
 
     @GetMapping("/")
-    public List<Patient> getAllPatients() {
-        return patientService.getAllPatients();
+    public ResponseEntity<List<Patient>> getAllPatients() {
+        List<Patient> patients = patientService.getAllPatients();
+        return ResponseEntity.ok(patients);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Patient> getPatientById(@PathVariable Long id) {
+        Patient patient = patientService.getPatientById(id);
+        if (patient != null) {
+            return ResponseEntity.ok(patient);
+        }
+        return ResponseEntity.notFound().build();
     }
 
     @PostMapping("/create")
-    public void createPatient(@RequestBody Patient patient){
-
-        patientService.createPatient(patient);
-        // return "Create a new patient";
+    public ResponseEntity<String> createPatient(@RequestBody Patient patient){
+        try {
+            patientService.createPatient(patient);
+            return ResponseEntity.ok("Patient created successfully");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error creating patient: " + e.getMessage());
+        }
     }
 
 

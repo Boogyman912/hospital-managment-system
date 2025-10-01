@@ -17,7 +17,7 @@ public class Issue {
 
     @ManyToOne
     @JoinColumn(name = "doctor_id", nullable = false)
-    private Staff doctor;
+    private Doctor doctor; // CHANGED: Use Doctor instead of Staff
 
     @Column(length = 500)
     private String description;
@@ -32,7 +32,7 @@ public class Issue {
     public Issue() {
     }
 
-    public Issue(Appointment appointment, Staff doctor, String description, IssueStatus status) {
+    public Issue(Appointment appointment, Doctor doctor, String description, IssueStatus status) { // CHANGED: Doctor instead of Staff
         this.appointment = appointment;
         this.doctor = doctor;
         this.description = description;
@@ -55,11 +55,11 @@ public class Issue {
         this.appointment = appointment;
     }
 
-    public Staff getDoctor() {
+    public Doctor getDoctor() { // CHANGED: return Doctor
         return doctor;
     }
 
-    public void setDoctor(Staff doctor) {
+    public void setDoctor(Doctor doctor) { // CHANGED: accept Doctor
         this.doctor = doctor;
     }
 

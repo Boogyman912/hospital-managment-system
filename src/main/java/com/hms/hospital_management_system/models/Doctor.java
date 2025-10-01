@@ -7,25 +7,30 @@ import jakarta.persistence.*;
 public class Doctor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "doctor_id")
     private Long doctor_id;
 
-    @Column(length = 100 ,nullable = false)
+    @Column(name = "name", length = 100, nullable = false)
     private String name;
 
+    @Column(name = "specialization")
     private String specialization;
 
-    @Column(length = 100, unique = true, nullable = false)
+    @Column(name = "username", length = 100, unique = true, nullable = false)
     private String username;
 
-    @Column(length = 255, nullable = false)
+    @Column(name = "hashedpassword", length = 255, nullable = false)
     private String hashedpassword;
 
-    @Column(length = 100, unique = true, nullable = false)
+    @Column(name = "email", length = 100, unique = true, nullable = false)
     private String email;
-    @Column(length = 15, unique = true, nullable = false)
+
+    @Column(name = "phone_number", length = 15, unique = true, nullable = false)
     private String phone_number;
-    
+
+    @Column(name = "active")
     private Boolean active;
+
 
 
     public Doctor() {
@@ -72,6 +77,28 @@ public class Doctor {
     public void setHashedpassword(String hashedpassword) {
         this.hashedpassword = hashedpassword;
     }
+
+    public String getEmail() {
+    return email;
+}
+public void setEmail(String email) {
+    this.email = email;
+}
+
+public String getPhone_number() {
+    return phone_number;
+}
+public void setPhone_number(String phone_number) {
+    this.phone_number = phone_number;
+}
+
+public Boolean getActive() {
+    return active;
+}
+public void setActive(Boolean active) {
+    this.active = active;
+}
+
 
 
 }

@@ -1,0 +1,48 @@
+[
+  {
+    "name": "Dr. Aditi Sharma",
+    "specialization": "Cardiology",
+    "username": "aditi.sharma",
+    "hashedpassword": "pass123",
+    "email": "aditi.sharma@example.com",
+    "phone_number": "9000000001",
+    "active": true
+  },
+  {
+    "name": "Dr. Rohan Mehta",
+    "specialization": "Neurology",
+    "username": "rohan.mehta",
+    "hashedpassword": "pass123",
+    "email": "rohan.mehta@example.com",
+    "phone_number": "9000000002",
+    "active": true
+  },
+  {
+    "name": "Dr. Neha Kapoor",
+    "specialization": "Dermatology",
+    "username": "neha.kapoor",
+    "hashedpassword": "pass123",
+    "email": "neha.kapoor@example.com",
+    "phone_number": "9000000003",
+    "active": true
+  },
+  {
+    "name": "Dr. Arjun Iyer",
+    "specialization": "Orthopedics",
+    "username": "arjun.iyer",
+    "hashedpassword": "pass123",
+    "email": "arjun.iyer@example.com",
+    "phone_number": "9000000004",
+    "active": false
+  },
+  {
+    "name": "Dr. Priya Nair",
+    "specialization": "Pediatrics",
+    "username": "priya.nair",
+    "hashedpassword": "pass123",
+    "email": "priya.nair@example.com",
+    "phone_number": "9000000005",
+    "active": true
+  }
+]
+

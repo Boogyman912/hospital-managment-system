@@ -8,6 +8,7 @@ public class HospitalManagementSystemApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(HospitalManagementSystemApplication.class, args);
+		System.out.println("Hospital Management System is running on port 8080");
 	}
 
 }

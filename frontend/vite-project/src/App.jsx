@@ -1,5 +1,7 @@
 
 import React, { useState } from 'react';
+import AppointmentBooking from './AppointmentBooking';
+import DoctorManagement from './DoctorManagement';
 
 // --- Helper Components & Data ---
 
@@ -27,15 +29,16 @@ const iconPaths = {
 
 // --- Main Components ---
 
-const Header = () => (
+const Header = ({ onNavigate }) => (
     <header className="bg-gray-900 text-white py-4 px-8 md:px-16">
         <div className="container mx-auto flex justify-between items-center">
-            <h1 className="text-2xl font-bold">[Hospital Name]</h1>
+            <h1 className="text-2xl font-bold cursor-pointer" onClick={() => onNavigate('home')}>Hospital Management System</h1>
             <nav className="hidden md:flex items-center space-x-8">
-                <a href="#home" className="hover:text-blue-400 transition-colors">Home</a>
-                <a href="#about" className="hover:text-blue-400 transition-colors">About Us</a>
-                <a href="#booking" className="hover:text-blue-400 transition-colors">Book an Appointment</a>
-                <a href="#login" className="bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg transition-colors">Login</a>
+                <button onClick={() => onNavigate('home')} className="hover:text-blue-400 transition-colors">Home</button>
+                <button onClick={() => onNavigate('about')} className="hover:text-blue-400 transition-colors">About Us</button>
+                <button onClick={() => onNavigate('booking')} className="hover:text-blue-400 transition-colors">Book an Appointment</button>
+                <button onClick={() => onNavigate('doctors')} className="hover:text-blue-400 transition-colors">Manage Doctors</button>
+                <button onClick={() => onNavigate('login')} className="bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg transition-colors">Login</button>
             </nav>
             <button className="md:hidden text-white">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" /></svg>
@@ -106,13 +109,15 @@ const AboutUs = () => (
 );
 
 
-const Booking = () => (
+const Booking = ({ onStartBooking }) => (
     <section id="booking" className="bg-gray-900 text-white py-20 px-8 md:px-16">
         <div className="container mx-auto grid md:grid-cols-2 gap-12 items-center">
             <div>
                 <h2 className="text-3xl md:text-4xl font-bold mb-4">Book an Appointment</h2>
                 <p className="text-gray-400 mb-8">This section allows patients to view available doctors, select an online or offline slot, verify their phone number through OTP, and confirm their appointment. After confirmation, the appointment details and receipt are generated, and notifications are sent via WhatsApp and email.</p>
-                <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition-colors text-lg">
+                <button 
+                    onClick={onStartBooking}
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition-colors text-lg">
                     Schedule Your Visit
                 </button>
             </div>
@@ -169,14 +174,28 @@ const Footer = () => (
 // --- Main App Component ---
 
 export default function App() {
+    const [currentView, setCurrentView] = useState('home');
+
+    const handleNavigate = (view) => {
+        setCurrentView(view);
+    };
+
+    if (currentView === 'booking') {
+        return <AppointmentBooking />;
+    }
+
+    if (currentView === 'doctors') {
+        return <DoctorManagement />;
+    }
+
     return (
         <div className="bg-gray-900 font-sans">
-            <Header />
+            <Header onNavigate={handleNavigate} />
             <main>
                 <Hero />
                 <Features />
                 <AboutUs />
-                <Booking />
+                <Booking onStartBooking={() => setCurrentView('booking')} />
                 <Login />
             </main>
             <Footer />

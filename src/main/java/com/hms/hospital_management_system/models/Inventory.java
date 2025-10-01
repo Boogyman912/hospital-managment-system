@@ -1,7 +1,7 @@
 package com.hms.hospital_management_system.models;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime; 
+import java.time.LocalDate; 
 
 @Entity
 @Table(name = "inventory")
@@ -13,16 +13,19 @@ public class Inventory {
 
     private String itemName;
 
+    private String brandName;
+
     private Integer quantity;
 
     private Double unitPrice;
 
-    private LocalDateTime lastRestocked;
+    private LocalDate lastRestocked;
 
     public Inventory() {
     }
-    public Inventory(String itemName, Integer quantity, Double unitPrice, LocalDateTime lastRestocked) {
+    public Inventory(String itemName,String brandName, Integer quantity, Double unitPrice, LocalDate lastRestocked) {
         this.itemName = itemName;
+        this.brandName = brandName;
         this.quantity = quantity;
         this.unitPrice = unitPrice;
         this.lastRestocked = lastRestocked;
@@ -39,6 +42,12 @@ public class Inventory {
     public void setItemName(String itemName) {
         this.itemName = itemName;
     }
+    public String getBrandName() {
+        return brandName;
+    }
+    public void setBrandName(String brandName) {
+        this.brandName = brandName;
+    }
     public Integer getQuantity() {
         return quantity;
     }
@@ -50,10 +59,10 @@ public class Inventory {
     public void setUnitPrice(Double unitPrice) {
         this.unitPrice = unitPrice;
     }
-    public LocalDateTime getLastRestocked() {
+    public LocalDate getLastRestocked() {
         return lastRestocked;
     }
-    public void setLastRestocked(LocalDateTime lastRestocked) {
+    public void setLastRestocked(LocalDate lastRestocked) {
         this.lastRestocked = lastRestocked;
     }
     
