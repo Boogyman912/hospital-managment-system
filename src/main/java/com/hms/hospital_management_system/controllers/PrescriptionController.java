@@ -20,56 +20,103 @@ public class PrescriptionController {
     @Autowired
     private PrescriptionService prescriptionService;
 
+    //why is ResponseEntity<?> used?
+    //because we want to return a response entity with a body of any type
     @GetMapping("/doctor/{doctor_id}/patient/{patient_id}")
-    public ResponseEntity<List<Prescription>> getPrescriptionsByDoctorAndPatient(@PathVariable Long doctor_id, @PathVariable Long patient_id) {
-        List<Prescription> prescriptions = prescriptionService.getPrescriptionsByDoctorAndPatient(doctor_id, patient_id);
-        return ResponseEntity.ok(prescriptions);
+    public ResponseEntity<?> getPrescriptionsByDoctorAndPatient(@PathVariable Long doctor_id, @PathVariable Long patient_id) {
+        try {
+            List<Prescription> prescriptions = prescriptionService.getPrescriptionsByDoctorAndPatient(doctor_id, patient_id);
+            return ResponseEntity.ok(prescriptions);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error retrieving prescriptions: " + e.getMessage());
+        }
     }
 
     @GetMapping("/doctor/{doctor_id}/patient/{patient_id}/date/{date_issued}")
-    public ResponseEntity<List<Prescription>> getPrescriptionsByDoctorAndPatientAndDateIssued(@PathVariable Long doctor_id, @PathVariable Long patient_id, @PathVariable LocalDate date_issued) {
-        List<Prescription> prescriptions = prescriptionService.getPrescriptionsByDoctorAndPatientAndDateIssued(doctor_id, patient_id, date_issued);
-        return ResponseEntity.ok(prescriptions);
+    public ResponseEntity<?> getPrescriptionsByDoctorAndPatientAndDateIssued(@PathVariable Long doctor_id, @PathVariable Long patient_id, @PathVariable LocalDate date_issued) {
+        try {
+            List<Prescription> prescriptions = prescriptionService.getPrescriptionsByDoctorAndPatientAndDateIssued(doctor_id, patient_id, date_issued);
+            return ResponseEntity.ok(prescriptions);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error retrieving prescriptions: " + e.getMessage());
+        }
     }
 
     @GetMapping("/doctor/{doctor_id}")
-    public ResponseEntity<List<Prescription>> getPrescriptionsByDoctor(@PathVariable Long doctor_id) {
-        List<Prescription> prescriptions = prescriptionService.getPrescriptionsByDoctor(doctor_id);
-        return ResponseEntity.ok(prescriptions);
+    public ResponseEntity<?> getPrescriptionsByDoctor(@PathVariable Long doctor_id) {
+        try {
+            List<Prescription> prescriptions = prescriptionService.getPrescriptionsByDoctor(doctor_id);
+            return ResponseEntity.ok(prescriptions);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error retrieving prescriptions: " + e.getMessage());
+        }
     }
 
     @GetMapping("/patient/{patient_id}")
-    public ResponseEntity<List<Prescription>> getPrescriptionsByPatient(@PathVariable Long patient_id) {
-        List<Prescription> prescriptions = prescriptionService.getPrescriptionsByPatient(patient_id);
-        return ResponseEntity.ok(prescriptions);
+    public ResponseEntity<?> getPrescriptionsByPatient(@PathVariable Long patient_id) {
+        try {
+            List<Prescription> prescriptions = prescriptionService.getPrescriptionsByPatient(patient_id);
+            return ResponseEntity.ok(prescriptions);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error retrieving prescriptions: " + e.getMessage());
+        }
     }
 
     @PostMapping("/create")
     public ResponseEntity<String> createPrescription(@RequestBody Prescription prescription) {
-        prescriptionService.createPrescription(prescription);
-        return ResponseEntity.ok("Prescription created successfully");
+        try {
+            prescriptionService.createPrescription(prescription);
+            return ResponseEntity.ok("Prescription created successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error creating prescription: " + e.getMessage());
+        }
     }
     
     @PatchMapping("/update/{prescription_id}")
     public ResponseEntity<String> updatePrescription(@PathVariable Long prescription_id, @RequestBody Prescription prescription) {
-        List<String> medications = prescription.getMedications();
-        List<String> labTests = prescription.getLabTests();
-        String instructions = prescription.getInstructions();
-        LocalDate date_issued = prescription.getDateIssued();
-        prescriptionService.updatePrescription(prescription_id, medications, labTests, instructions, date_issued);
-        return ResponseEntity.ok("Prescription updated successfully");
+        try {
+            List<String> medications = prescription.getMedications();
+            List<String> labTests = prescription.getLabTests();
+            String instructions = prescription.getInstructions();
+            LocalDate date_issued = prescription.getDateIssued();
+            prescriptionService.updatePrescription(prescription_id, medications, labTests, instructions, date_issued);
+            return ResponseEntity.ok("Prescription updated successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error updating prescription: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/{prescription_id}")
+    public ResponseEntity<?> getPrescriptionById(@PathVariable Long prescription_id) {
+        try {
+            Prescription prescription = prescriptionService.getPrescriptionById(prescription_id);
+            if (prescription == null) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.ok(prescription);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error retrieving prescription: " + e.getMessage());
+        }
     }
 
     @DeleteMapping("/delete/{prescription_id}")
     public ResponseEntity<String> deletePrescription(@PathVariable Long prescription_id) {
-        prescriptionService.deletePrescription(prescription_id);
-        return ResponseEntity.ok("Prescription deleted successfully");
+        try {
+            prescriptionService.deletePrescription(prescription_id);
+            return ResponseEntity.ok("Prescription deleted successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error deleting prescription: " + e.getMessage());
+        }
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<Prescription>> getAllPrescriptions() {
-        List<Prescription> prescriptions = prescriptionService.getAllPrescriptions();
-        return ResponseEntity.ok(prescriptions);
+    public ResponseEntity<?> getAllPrescriptions() {
+        try {
+            List<Prescription> prescriptions = prescriptionService.getAllPrescriptions();
+            return ResponseEntity.ok(prescriptions);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error retrieving prescriptions: " + e.getMessage());
+        }
     }
 
 

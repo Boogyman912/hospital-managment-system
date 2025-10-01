@@ -1,6 +1,7 @@
 package com.hms.hospital_management_system.jpaRepository;
 import com.hms.hospital_management_system.models.Prescription;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
 import java.util.List;
 import org.springframework.data.jpa.repository.Query;
@@ -25,9 +26,11 @@ public interface PrescriptionRepository extends JpaRepository<Prescription, Long
     @Query("SELECT p FROM Prescription p WHERE p.patient.patient_id = :patient_id")
     List<Prescription> findByPatient(Long patient_id);
 
-    @Query("update Prescription set medications = :medications, instructions = :instructions, date_issued = :date_issued where prescription_id = :prescription_id")
-    void updatePrescription(Long prescription_id, String medications, String instructions, LocalDate date_issued);
+    @Modifying
+    @Query("update Prescription p set p.medications = :medications, p.labTests = :labTests, p.instructions = :instructions, p.date_issued = :date_issued where p.prescription_id = :prescription_id")
+    void updatePrescription(Long prescription_id, List<String> medications, List<String> labTests, String instructions, LocalDate date_issued);
 
+    @Modifying
     @Query("delete from Prescription where prescription_id = :prescription_id")
     void deletePrescription(Long prescription_id);
 

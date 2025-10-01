@@ -26,6 +26,8 @@ public class LabTest {
 
     private Double testCost;
 
+
+
     public LabTest() {
     }
 

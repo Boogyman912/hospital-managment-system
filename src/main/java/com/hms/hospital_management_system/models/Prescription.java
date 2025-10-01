@@ -111,6 +111,20 @@ public class Prescription {
         this.labTests = labTests;
     }
 
+    public void addMedications(List<String> newMedications) {
+        if (this.medications == null) {
+            this.medications = new ArrayList<>();
+        }
+        this.medications.addAll(newMedications);
+    }
+
+    public void addLabTests(List<String> newLabTests) {
+        if (this.labTests == null) {
+            this.labTests = new ArrayList<>();
+        }
+        this.labTests.addAll(newLabTests);
+    }
+
     public String getInstructions() {
         return instructions;
     }

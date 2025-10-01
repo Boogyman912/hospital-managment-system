@@ -7,7 +7,6 @@ import com.hms.hospital_management_system.jpaRepository.PrescriptionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import java.time.LocalDate;
 
-
 @Service
 public class PrescriptionService {
 
@@ -33,8 +32,24 @@ public class PrescriptionService {
         return PrescriptionRepository.findByPatient(patient_id);
     }
 
-    public void updatePrescription(Long prescription_id, List<String> medications,List<String> labTests, String instructions, LocalDate date_issued) {
-        PrescriptionRepository.updatePrescription(prescription_id, medications, labTests, instructions, date_issued);
+    public Prescription updatePrescription(Long prescription_id, List<String> medications, List<String> labTests, String instructions, LocalDate date_issued) {
+        Prescription existingPrescription = PrescriptionRepository.findById(prescription_id).orElseThrow(()-> new RuntimeException("Prescription not found"));
+        if (existingPrescription == null) {
+            return null;
+        }
+        if (medications != null) {
+            existingPrescription.addMedications(medications);
+        }
+        if (labTests != null) {
+            existingPrescription.addLabTests(labTests);
+        }
+        if (instructions != null) {
+            existingPrescription.setInstructions(instructions);
+        }
+        if (date_issued != null) {
+            existingPrescription.setDateIssued(date_issued);
+        }
+        return PrescriptionRepository.save(existingPrescription);
     }
 
     public void deletePrescription(Long prescription_id) {
@@ -43,6 +58,10 @@ public class PrescriptionService {
 
     public List<Prescription> getAllPrescriptions() {
         return PrescriptionRepository.findAllPrescriptions();
+    }
+
+    public Prescription getPrescriptionById(Long prescription_id) {
+        return PrescriptionRepository.findById(prescription_id).orElse(null);
     }
 
 }

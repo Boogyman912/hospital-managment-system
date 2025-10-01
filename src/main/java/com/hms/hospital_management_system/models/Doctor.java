@@ -31,6 +31,9 @@ public class Doctor {
     @Column(name = "active")
     private Boolean active;
 
+    @Column(name = "rating")
+    private Double rating; // Average rating from feedbacks
+
 
 
     public Doctor() {
@@ -44,6 +47,7 @@ public class Doctor {
         this.email = email;
         this.phone_number = phone_number;
         this.active = active;
+        this.rating = 0.0; // Initial rating
     }
 
     // setters and getters
@@ -99,6 +103,12 @@ public void setActive(Boolean active) {
     this.active = active;
 }
 
+public Double getRating() {
+    return rating;  
+}
+public void setRating(Double rating) {
+    this.rating = rating;
+}
 
 
 }

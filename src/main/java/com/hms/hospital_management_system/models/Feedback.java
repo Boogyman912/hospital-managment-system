@@ -20,7 +20,7 @@ public class Feedback {
     @JoinColumn(name = "patient_id")
     private Patient patient;
 
-    private Integer rating; // 1-5
+    private Double rating; // 1-5
 
     @Column(length = 500)
     private String comments;
@@ -31,13 +31,13 @@ public class Feedback {
     }
 
     
-    public Feedback(Long feedbackId, Appointment appointment, Patient patient, Integer rating, String comments, LocalDateTime submittedAt) {
+    public Feedback(Long feedbackId, Appointment appointment, Patient patient, Double rating, String comments) {
         this.feedbackId = feedbackId;
         this.appointment = appointment;
         this.patient = patient;
         this.rating = rating;
         this.comments = comments;
-        this.submittedAt = submittedAt;
+        this.submittedAt = LocalDateTime.now();
     }
 
     public Long getFeedbackId() {
@@ -64,11 +64,11 @@ public class Feedback {
         this.patient = patient;
     }
 
-    public Integer getRating() {
+    public Double getRating() {
         return rating;
     }
 
-    public void setRating(Integer rating) {
+    public void setRating(Double rating) {
         this.rating = rating;
     }
 
@@ -84,7 +84,4 @@ public class Feedback {
         return submittedAt;
     }
 
-    public void setSubmittedAt(LocalDateTime submittedAt) {
-        this.submittedAt = submittedAt;
-    }
 }
