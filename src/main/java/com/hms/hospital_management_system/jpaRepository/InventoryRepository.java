@@ -57,6 +57,9 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
     @Modifying
     @Query("Select * from Inventory")
     List<Inventory> findAllInventory();
+
+    @Query("Select i from Inventory i where i.itemName = :itemName and i.brandName = :brandName ")
+    Inventory findByItemNameAndBrandName(String itemName, String brandName);
     
     
 }

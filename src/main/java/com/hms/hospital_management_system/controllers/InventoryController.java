@@ -15,75 +15,133 @@ public class InventoryController {
 
     @GetMapping("/all")
     public ResponseEntity<List<Inventory>> getAllInventory() {
-        List<Inventory> inventory = inventoryService.getAllInventory();
-        return ResponseEntity.ok(inventory);
+        try {
+            List<Inventory> inventory = inventoryService.getAllInventory();
+            return ResponseEntity.ok(inventory);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
     @GetMapping("/item/{id}")
     public ResponseEntity<Inventory> getInventoryById(@PathVariable Long id) {
-        Inventory inventory = inventoryService.getInventoryById(id);
-        return ResponseEntity.ok(inventory);
+        try {
+            Inventory inventory = inventoryService.getInventoryById(id);
+            return ResponseEntity.ok(inventory);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
     
     @GetMapping("/itemName/{itemName}")
     public ResponseEntity<List<Inventory>> getInventoryByItemName(@PathVariable String itemName) {
-        List<Inventory> inventory = inventoryService.getInventoryByItemName(itemName);
-        return ResponseEntity.ok(inventory);
+        try {
+            List<Inventory> inventory = inventoryService.getInventoryByItemName(itemName);
+            return ResponseEntity.ok(inventory);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
     
     @GetMapping("/ItemBrand/{brandName}")
     public ResponseEntity<List<Inventory>> getInventoryByBrandName(@PathVariable String brandName) {
-        List<Inventory> inventory = inventoryService.getInventoryByBrandName(brandName);
-        return ResponseEntity.ok(inventory);
+        try {
+            List<Inventory> inventory = inventoryService.getInventoryByBrandName(brandName);
+            return ResponseEntity.ok(inventory);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @GetMapping("/item/{itemName}/{brandName}")
+    public ResponseEntity<Inventory> getInventoryByItemNameAndBrandName(@PathVariable String itemName, @PathVariable String brandName) {
+        try {
+            Inventory inventory = inventoryService.getInventoryByItemNameAndBrandName(itemName, brandName);
+            return ResponseEntity.ok(inventory);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
     
     @GetMapping("/quantityZero")
     public ResponseEntity<List<Inventory>> getInventoryByQuantityZero() {
-        List<Inventory> inventory = inventoryService.getInventoryByQuantityZero();
-        return ResponseEntity.ok(inventory);
+        try {
+            List<Inventory> inventory = inventoryService.getInventoryByQuantityZero();
+            return ResponseEntity.ok(inventory);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
     
     @GetMapping("/quantityLessThan/{quantity}")
     public ResponseEntity<List<Inventory>> getInventoryByQuantityLessThan(@PathVariable Integer quantity) {
-        List<Inventory> inventory = inventoryService.getInventoryByQuantityLessThan(quantity);
-        return ResponseEntity.ok(inventory);
+        try {
+            List<Inventory> inventory = inventoryService.getInventoryByQuantityLessThan(quantity);
+            return ResponseEntity.ok(inventory);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
     
     @PostMapping("/create")
     public ResponseEntity<String> createInventory(@RequestBody Inventory inventory) {
-        inventoryService.createInventory(inventory);
-        return ResponseEntity.ok("Inventory created successfully");
+        try {
+            inventoryService.createInventory(inventory);
+            return ResponseEntity.ok("Inventory created successfully");
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error creating inventory");
+        }
     }
     
     @PatchMapping("/updateItem/{id}")
     public ResponseEntity<String> updateInventory(@PathVariable Long id, @RequestBody Inventory inventory) {
-        inventoryService.updateInventory(id, inventory);
-        return ResponseEntity.ok("Inventory updated successfully");
+        try {
+            inventoryService.updateInventory(id, inventory);
+            return ResponseEntity.ok("Inventory updated successfully");
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error updating inventory");
+        }
     }
     
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteInventory(@PathVariable Long id) {
-        inventoryService.deleteInventory(id);
-        return ResponseEntity.ok("Inventory deleted successfully");
+        try {
+            inventoryService.deleteInventory(id);
+            return ResponseEntity.ok("Inventory deleted successfully");
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error deleting inventory");
+        }
     }
 
     @PatchMapping("/increaseQuantity/{id}")
     public ResponseEntity<String> increaseQuantity(@PathVariable Long id, @RequestBody Integer quantity) {
-        inventoryService.increaseQuantity(id, quantity);
-        inventoryService.updateLastRestocked(id);
-        return ResponseEntity.ok("Item restocked successfully");
+        try {
+            inventoryService.increaseQuantity(id, quantity);
+            inventoryService.updateLastRestocked(id);
+            return ResponseEntity.ok("Item restocked successfully");
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error restocking item");
+        }
     }
     
     @PatchMapping("/decreaseQuantity/{id}")
     public ResponseEntity<String> decreaseQuantity(@PathVariable Long id, @RequestBody Integer quantity) {
-        inventoryService.decreaseQuantity(id, quantity);
-        return ResponseEntity.ok("Inventory quantity decreased successfully");
+        try {
+            inventoryService.decreaseQuantity(id, quantity);
+            return ResponseEntity.ok("Inventory quantity decreased successfully");
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error decreasing quantity");
+        }
     }
     
     @PatchMapping("/updatePrice/{id}")
     public ResponseEntity<String> updatePrice(@PathVariable Long id, @RequestBody Double add){
-        inventoryService.updateUnitPrice(id, add);
-        return ResponseEntity.ok("Price updated successfully");
+        try {
+            inventoryService.updateUnitPrice(id, add);
+            return ResponseEntity.ok("Price updated successfully");
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error updating price");
+        }
     }
     
     

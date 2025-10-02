@@ -1,7 +1,7 @@
 package com.hms.hospital_management_system.services;
 
 import org.springframework.stereotype.Service;
-import java.util.List;
+import java.util.*;
 import com.hms.hospital_management_system.models.Prescription;
 import com.hms.hospital_management_system.jpaRepository.PrescriptionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +32,7 @@ public class PrescriptionService {
         return PrescriptionRepository.findByPatient(patient_id);
     }
 
-    public Prescription updatePrescription(Long prescription_id, List<String> medications, List<String> labTests, String instructions, LocalDate date_issued) {
+    public Prescription updatePrescription(Long prescription_id, List<Map<String,String>> medications, List<Map<String,String>> labTests, String instructions, LocalDate date_issued) {
         Prescription existingPrescription = PrescriptionRepository.findById(prescription_id).orElseThrow(()-> new RuntimeException("Prescription not found"));
         if (existingPrescription == null) {
             return null;

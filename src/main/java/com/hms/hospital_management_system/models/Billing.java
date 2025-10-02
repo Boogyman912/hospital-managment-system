@@ -3,7 +3,8 @@ package com.hms.hospital_management_system.models;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.time.LocalDate; 
-
+import java.util.List;
+import com.hms.hospital_management_system.models.Prescription;
 @Entity
 @Table(name = "billing")
 public class Billing {
@@ -12,27 +13,27 @@ public class Billing {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long billingId;
 
-    @ManyToOne
-    @JoinColumn(name = "patient_id")
-    private Patient patient;
+    @OneToOne
+    @JoinColumn(name = "prescription_id")
+    private Prescription prescription;
 
     private Double totalAmount;
-
-    private Double amountPaid;
-
-    private Double dueAmount;
+    
+    private Status status;
+    public enum Status {
+        PAID, UNPAID, PENDING
+    }
 
     private LocalDate paymentDate;
 
     public Billing() {
     }
 
-    public Billing(Patient patient, Double totalAmount, Double amountPaid, Double dueAmount, LocalDate paymentDate) {
-        this.patient = patient;
+    public Billing(Prescription prescription, Double totalAmount, LocalDate paymentDate, Status status) {
+        this.prescription = prescription;
         this.totalAmount = totalAmount;
-        this.amountPaid = amountPaid;
-        this.dueAmount = dueAmount;
         this.paymentDate = paymentDate;
+        this.status = status;
     }
 
     public Long getBillingId() {
@@ -43,12 +44,12 @@ public class Billing {
         this.billingId = billingId;
     }
 
-    public Patient getPatient() {
-        return patient;
+    public Prescription getPrescription() {
+        return prescription;
     }
 
-    public void setPatient(Patient patient) {
-        this.patient = patient;
+    public void setPrescription(Prescription prescription) {
+        this.prescription = prescription;
     }
 
     public Double getTotalAmount() {
@@ -59,20 +60,12 @@ public class Billing {
         this.totalAmount = totalAmount;
     }
 
-    public Double getAmountPaid() {
-        return amountPaid;
+    public Status getStatus() {
+        return status;
     }
 
-    public void setAmountPaid(Double amountPaid) {
-        this.amountPaid = amountPaid;
-    }
-
-    public Double getDueAmount() {
-        return dueAmount;
-    }
-
-    public void setDueAmount(Double dueAmount) {
-        this.dueAmount = dueAmount;
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
     public LocalDate getPaymentDate() {

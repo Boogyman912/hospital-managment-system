@@ -63,6 +63,10 @@ public class InventoryService {
     public void updateLastRestocked(Long id) {
         inventoryRepository.updateLastRestocked(id);
     }
+
+    public Inventory getInventoryByItemNameAndBrandName(String itemName, String brandName) {
+        return inventoryRepository.findByItemNameAndBrandName(itemName, brandName);
+    }
     
     
     

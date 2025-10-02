@@ -4,7 +4,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.http.ResponseEntity;
-import java.util.List;
+import java.util.*;
 import com.hms.hospital_management_system.models.Prescription;
 import com.hms.hospital_management_system.services.PrescriptionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,8 +75,8 @@ public class PrescriptionController {
     @PatchMapping("/update/{prescription_id}")
     public ResponseEntity<String> updatePrescription(@PathVariable Long prescription_id, @RequestBody Prescription prescription) {
         try {
-            List<String> medications = prescription.getMedications();
-            List<String> labTests = prescription.getLabTests();
+            List<Map<String,String>> medications = prescription.getMedications();
+            List<Map<String,String>> labTests = prescription.getLabTests();
             String instructions = prescription.getInstructions();
             LocalDate date_issued = prescription.getDateIssued();
             prescriptionService.updatePrescription(prescription_id, medications, labTests, instructions, date_issued);

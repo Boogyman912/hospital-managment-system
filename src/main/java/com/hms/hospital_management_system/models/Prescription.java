@@ -34,7 +34,7 @@ public class Prescription {
     //}
     //pricing will be considered in the inventory table and billing table
     @Column(columnDefinition = "json")
-    private List<String> medications; // JSON string
+    private List<Map<String,String>> medications; // JSON string
     //Tests should be provided in this format 
     //{
     //    "test_name": "test_name",
@@ -42,7 +42,7 @@ public class Prescription {
     //}
 
     @Column(columnDefinition = "json")
-    private List<String> labTests;
+    private List<Map<String,String>> labTests;
     // it will be a list of lab tests in json format
 
     @Column(length = 500)
@@ -53,7 +53,7 @@ public class Prescription {
     public Prescription() {
     }
 
-    public Prescription(Appointment appointment, Patient patient, Doctor doctor, List<String> medications, List<String> labTests, String instructions, LocalDate dateIssued) {
+    public Prescription(Appointment appointment, Patient patient, Doctor doctor, List<Map<String,String>> medications, List<Map<String,String>> labTests, String instructions, LocalDate dateIssued) {
         this.appointment = appointment;
         this.patient = patient;
         this.doctor = doctor;
@@ -95,30 +95,30 @@ public class Prescription {
         this.doctor = doctor;
     }
 
-    public List<String> getMedications() {
+    public List<Map<String,String>> getMedications() {
         return medications;
     }
 
-    public void setMedications(List<String> medications) {
+    public void setMedications(List<Map<String,String>> medications) {
         this.medications = medications;
     }
 
-    public List<String> getLabTests() {
+    public List<Map<String,String>> getLabTests() {
         return labTests;
     }
 
-    public void setLabTests(List<String> labTests) {
+    public void setLabTests(List<Map<String,String>> labTests) {
         this.labTests = labTests;
     }
 
-    public void addMedications(List<String> newMedications) {
+    public void addMedications(List<Map<String,String>> newMedications) {
         if (this.medications == null) {
             this.medications = new ArrayList<>();
         }
         this.medications.addAll(newMedications);
     }
 
-    public void addLabTests(List<String> newLabTests) {
+    public void addLabTests(List<Map<String,String>> newLabTests) {
         if (this.labTests == null) {
             this.labTests = new ArrayList<>();
         }

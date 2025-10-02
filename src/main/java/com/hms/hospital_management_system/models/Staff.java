@@ -1,7 +1,7 @@
 package com.hms.hospital_management_system.models;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime; 
+import java.time.LocalDate; 
 
 
 @Entity
@@ -16,22 +16,24 @@ public class Staff {
 
     private String role;
 
+    @Column(unique = true)
     private String email;
 
+    @Column(name = "phone_number" , length = 15)
     private String phoneNumber;
 
-    private String shiftTimings;
+    private LocalDate dateOfJoining;
 
     public Staff() {
     }
 
-    public Staff(Long staffId, String name, String role, String email, String phoneNumber, String shiftTimings) {
+    public Staff(Long staffId, String name, String role, String email, String phoneNumber) {
         this.staffId = staffId;
         this.name = name;
         this.role = role;
         this.email = email;
         this.phoneNumber = phoneNumber;
-        this.shiftTimings = shiftTimings;
+        this.dateOfJoining = LocalDate.now();
     }
 
     public Long getStaffId() {
@@ -74,11 +76,12 @@ public class Staff {
         this.phoneNumber = phoneNumber;
     }
 
-    public String getShiftTimings() {
-        return shiftTimings;
+    public LocalDate getDateOfJoining() {
+        return dateOfJoining;
     }
+    public void setDateOfJoining(LocalDate dateOfJoining) {
+        this.dateOfJoining = dateOfJoining;
+    }
+    
 
-    public void setShiftTimings(String shiftTimings) {
-        this.shiftTimings = shiftTimings;
-    }
 }

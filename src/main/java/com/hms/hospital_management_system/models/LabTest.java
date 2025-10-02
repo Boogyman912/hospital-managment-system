@@ -20,6 +20,7 @@ public class LabTest {
     // @JoinColumn(name = "patient_id")
     // private Patient patient;
 
+    @Column(name = "test_name")
     private String testName;
 
     private String testType; // e.g., Blood Test, X-Ray, MRI
