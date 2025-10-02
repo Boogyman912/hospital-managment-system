@@ -16,12 +16,13 @@ public class Staff {
 
     private String role;
 
-    @Column(unique = true)
+    @Column(unique = true,nullable = true)
     private String email;
 
-    @Column(name = "phone_number" , length = 15)
+    @Column(name = "phone_number" , length = 15,unique = true)
     private String phoneNumber;
 
+    @Column(name = "date_of_joining",nullable = false)
     private LocalDate dateOfJoining;
 
     public Staff() {
@@ -82,6 +83,6 @@ public class Staff {
     public void setDateOfJoining(LocalDate dateOfJoining) {
         this.dateOfJoining = dateOfJoining;
     }
-    
+
 
 }

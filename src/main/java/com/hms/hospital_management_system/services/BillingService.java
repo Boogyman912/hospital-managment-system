@@ -10,6 +10,7 @@ import com.hms.hospital_management_system.jpaRepository.LabTestRepository;
 //importing services
 import com.hms.hospital_management_system.services.InventoryService;
 import com.hms.hospital_management_system.services.LabTestService;
+import jakarta.transaction.Transactional;
 import com.hms.hospital_management_system.models.Inventory;
 import com.hms.hospital_management_system.models.LabTest;
 import java.time.LocalDate;
@@ -27,6 +28,7 @@ public class BillingService {
     @Autowired
     private LabTestService labTestService;
 
+    @Transactional
     public Billing generateBillByPrescriptionId(Long prescription_Id) {
         try {
             Billing billing = new Billing();
