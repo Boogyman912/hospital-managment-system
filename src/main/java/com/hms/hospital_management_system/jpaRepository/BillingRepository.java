@@ -1,7 +1,6 @@
 package com.hms.hospital_management_system.jpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import com.hms.hospital_management_system.models.Billing;
 import java.util.List;
@@ -28,14 +27,12 @@ public interface BillingRepository extends JpaRepository<Billing, Long> {
     void generateBill(Long prescriptionId, Double amount, Date billingDate, String status);
     */
 
-    @Modifying
-    @Query("update Billing b set b.status = :status where b.billId = :billId")
-    void updateBillStatus(Long billId, String status);
-
     @Query("select b from Billing b where b.prescription.patient.patientId = :patientId")
     List<Billing> findBillsByPatientId(Long patientId);
 
     // it is one to one mapping so it will return only one bill
     @Query("select b from Billing b where b.prescription.prescriptionId = :prescriptionId")
     Billing findBillByPrescriptionId(Long prescriptionId);
+
+    
 }

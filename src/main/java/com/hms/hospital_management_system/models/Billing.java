@@ -15,8 +15,14 @@ public class Billing {
 
     @OneToOne
     @JoinColumn(name = "prescription_id")
+    @Column(nullable = true)
     private Prescription prescription;
 
+    private Patient patient;
+    @OneToMany
+    @JoinColumn(name = "inpatient_id")
+    @Column(nullable = true)
+    private List<Inpatient> inpatients;
     private Double totalAmount;
     
     private Status status;
@@ -29,11 +35,26 @@ public class Billing {
     public Billing() {
     }
 
-    public Billing(Prescription prescription, Double totalAmount, LocalDate paymentDate, Status status) {
+    public Billing(Prescription prescription, List<Inpatient> inpatients, Patient patient , Double totalAmount, LocalDate paymentDate, Status status) {
         this.prescription = prescription;
+        this.inpatients = inpatients;
         this.totalAmount = totalAmount;
         this.paymentDate = paymentDate;
         this.status = status;
+        this.patient = patient;
+    }
+    public List<Inpatient> getInpatients() {
+        return inpatients;
+    }
+    public void setInpatients(List<Inpatient> inpatients) {
+        this.inpatients = inpatients;
+    }
+
+    public Patient getPatient() {
+        return patient;
+    }
+    public void setPatient(Patient patient) {
+        this.patient = patient;
     }
 
     public Long getBillingId() {

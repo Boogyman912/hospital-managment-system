@@ -3,17 +3,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.hms.hospital_management_system.jpaRepository.BillingRepository;
 import com.hms.hospital_management_system.models.Billing;
-import com.hms.hospital_management_system.models.Prescription;
-//import inventory and labtests
-import com.hms.hospital_management_system.jpaRepository.InventoryRepository;
-import com.hms.hospital_management_system.jpaRepository.LabTestRepository;  
-//importing services
-import com.hms.hospital_management_system.services.InventoryService;
-import com.hms.hospital_management_system.services.LabTestService;
 import jakarta.transaction.Transactional;
 import com.hms.hospital_management_system.models.Inventory;
 import com.hms.hospital_management_system.models.LabTest;
 import java.time.LocalDate;
+import com.hms.hospital_management_system.models.Inpatient;
+import com.hms.hospital_management_system.jpaRepository.InpatientRepository;
 import java.util.*;
 
 @Service
@@ -23,20 +18,23 @@ public class BillingService {
     private BillingRepository billingRepository;
 
     @Autowired
+    private PrescriptionService prescriptionService;
+
+    @Autowired
     private InventoryService inventoryService;
 
     @Autowired
     private LabTestService labTestService;
 
+    @Autowired
+    private InpatientRepository inpatientRepository;
+
     @Transactional
     public Billing generateBillByPrescriptionId(Long prescription_Id) {
         try {
             Billing billing = new Billing();
-            Billing existingBilling = billingRepository.findBillByPrescriptionId(prescription_Id);
-            if (existingBilling == null || existingBilling.getPrescription() == null) {
-            throw new RuntimeException("Prescription not found for ID: " + prescription_Id);
-            }
-            billing.setPrescription(existingBilling.getPrescription());
+            
+            billing.setPrescription( prescriptionService.getPrescriptionById(prescription_Id));
             Double amount = 0.0;
             List<Map<String, String>> meds = billing.getPrescription().getMedications();
             List<Map<String, String>> labTest = billing.getPrescription().getLabTests();
@@ -59,7 +57,7 @@ public class BillingService {
                 amount += testCost;
             }
             }
-
+            billing.setPatient(prescriptionService.getPrescriptionById(prescription_Id).getPatient());
             billing.setTotalAmount(amount);
             billing.setStatus(Billing.Status.UNPAID);
             billing.setPaymentDate(null);
@@ -75,10 +73,35 @@ public class BillingService {
         }
     }
 
-    public void updateBillStatus(Long billId, String status) {
-        billingRepository.updateBillStatus(billId, status);
+    // to generate bill for all the rooms a patient stayed in
+    @Transactional
+    public Billing generateInpatientBill(List<Inpatient> inpatients) throws RuntimeException{
+        try{
+            Billing billing = new Billing();
+            Double totalAmount = 0.0;
+            for(Inpatient inpatient : inpatients){
+                if(inpatient.getDischargeDate() == null){
+                    inpatient.setDischargeDate(LocalDate.now());
+                }
+                Long daysStayed = java.time.temporal.ChronoUnit.DAYS.between(inpatient.getAdmissionDate(), inpatient.getDischargeDate());
+                daysStayed = daysStayed == 0 ? 1 : daysStayed; // Minimum 1 day charge
+                Double roomCharge = inpatient.getRoom().getPricePerDay();
+                totalAmount += daysStayed * roomCharge;
+                if(billing.getPatient() == null){
+                    billing.setPatient(inpatient.getPatient());
+                }
+            }
+            billing.setInpatients(inpatients);
+            billing.setTotalAmount(totalAmount);
+            billing.setStatus(Billing.Status.UNPAID);
+            billing.setPaymentDate(null);
+            billingRepository.save(billing);
+            return billing;
+        }catch(Exception e){
+            throw new RuntimeException("Error generating inpatient bill: " + e.getMessage());
+        }
     }
-
+     
     public List<Billing> getBillsByPatientId(Long patientId) {
         return billingRepository.findBillsByPatientId(patientId);
     }
@@ -120,6 +143,15 @@ public class BillingService {
         // For now, assume payment is successful.
         
         bill.setStatus(Billing.Status.PAID);
+
+        if(bill.getInpatients()!= null){
+            List<Inpatient> inpatients = bill.getInpatients();
+            for(Inpatient inpatient : inpatients){
+                inpatient.setIsBilled(true);
+                inpatientRepository.save(inpatient);
+            }
+        }
+
         LocalDate today = LocalDate.now();
         bill.setPaymentDate(today);
         billingRepository.save(bill);

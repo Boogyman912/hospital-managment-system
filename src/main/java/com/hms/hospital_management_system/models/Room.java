@@ -2,7 +2,6 @@ package com.hms.hospital_management_system.models;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime; 
-import com.hms.hospital_management_system.models.Patient;
 
 @Entity
 @Table(name = "rooms")
@@ -17,25 +16,46 @@ public class Room {
     @Enumerated(EnumType.STRING)
     private RoomType type;
 
+    
+
     @Enumerated(EnumType.STRING)
     private RoomStatus status;
 
-    @ManyToOne
-    @JoinColumn(name = "patient_id")
-    private Patient patient; // nullable
+    private LocalDateTime lastUpdated;
+
+    private Double pricePerDay;
 
     public enum RoomType { GENERAL, ICU, PRIVATE }
     public enum RoomStatus { AVAILABLE, OCCUPIED }
-    public Room() {
-        // Default constructor for JPA
+   
+    private Double genRoom = 1000.0;
+    private Double icuRoom = 5000.0;
+    private Double privateRoom = 3000.0;
+
+    private Double setPrice(RoomType type) {
+        switch (type) {
+            case GENERAL:
+                return genRoom;
+            case ICU:
+                return icuRoom;
+            case PRIVATE:
+                return privateRoom;
+            default:
+                return 0.0;
+        }
     }
 
-    public Room(String roomNumber, RoomType type, RoomStatus status, Patient patient) {
+    public Room(){
+    }
+
+    public Room(String roomNumber, RoomType type, RoomStatus status, LocalDateTime lastUpdated) {
         this.roomNumber = roomNumber;
         this.type = type;
         this.status = status;
-        this.patient = patient;
+        this.lastUpdated = lastUpdated;
+        this.pricePerDay = setPrice(type);
     }
+
     public Long getRoomId() {
         return roomId;
     }
@@ -58,6 +78,7 @@ public class Room {
 
     public void setType(RoomType type) {
         this.type = type;
+        this.pricePerDay = setPrice(type);
     }
 
     public RoomStatus getStatus() {
@@ -68,11 +89,57 @@ public class Room {
         this.status = status;
     }
 
-    public Patient getPatient() {
-        return patient;
+    public LocalDateTime getLastUpdated() {
+        return lastUpdated;
     }
 
-    public void setPatient(Patient patient) {
-        this.patient = patient;
+    public void setLastUpdated(LocalDateTime lastUpdated) {
+        this.lastUpdated = lastUpdated;
     }
+
+    public Double getPricePerDay() {
+        return pricePerDay;
+    }
+
+    public void setPricePerDay(Double pricePerDay) {
+        this.pricePerDay = pricePerDay;
+    }
+
+
+    // Set base prices for room types
+    public void setBasePrice(RoomType type, Double price) {
+        switch(type) {
+            case GENERAL:
+                genRoom = price;
+                break;
+            case ICU:
+                icuRoom = price;
+                break;
+            case PRIVATE:
+                privateRoom = price;
+                break;
+            default:
+                break;
+        }
+        // Update pricePerDay if type matches
+        if (this.type == type) {
+            this.pricePerDay = price;
+        }
+    }
+
+    // Get base price for a room type
+    public Double getBasePrice(RoomType type) {
+        switch(type) {
+            case GENERAL:
+                return genRoom;
+            case ICU:
+                return icuRoom;
+            case PRIVATE:
+                return privateRoom;
+            default:
+                return 0.0;
+        }
+    }
+
+
 }

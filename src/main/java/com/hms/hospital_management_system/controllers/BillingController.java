@@ -2,6 +2,7 @@ package com.hms.hospital_management_system.controllers;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import com.hms.hospital_management_system.services.InpatientService;
 import java.util.*;
 import com.hms.hospital_management_system.models.Billing;
 import com.hms.hospital_management_system.services.BillingService;
@@ -11,6 +12,8 @@ public class BillingController {
 
     @Autowired
     private BillingService billingService;
+    @Autowired
+    private InpatientService inpatientService;
 
     @PostMapping("/generateforprescription/{prescription_id}")
     public ResponseEntity<Billing> generateBillByPrescription(@PathVariable Long prescription_id) {
@@ -42,6 +45,16 @@ public class BillingController {
         }
     }
 
+    @GetMapping("/prescription/{prescription_id}")
+    public ResponseEntity<Billing> getBillsByPrescriptionId(@PathVariable Long prescription_id) {
+        try {
+            Billing bill = billingService.getBillByPrescriptionId(prescription_id);
+            return ResponseEntity.ok(bill);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
     @PostMapping("/pay/{bill_id}")
     public ResponseEntity<Boolean> payBill(@PathVariable Long bill_id) {
         try {
@@ -63,6 +76,15 @@ public class BillingController {
         }
     }
     
+    @PostMapping("/generateforinpatient/{patient_id}")
+    public ResponseEntity<Billing> generateBillByInpatient(@PathVariable Long patient_id) {
+        try {
+            Billing bill = inpatientService.generateInpatientBillForPatient(patient_id);
+            return ResponseEntity.ok(bill);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
 
 
 }

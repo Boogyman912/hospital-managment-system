@@ -4,7 +4,6 @@ import com.hms.hospital_management_system.models.Inventory;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import java.util.List;
-import java.time.LocalDateTime;
 import java.time.LocalDate;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.Modifying;
@@ -49,15 +48,7 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
     @Modifying
     @Query("Update Inventory set lastRestocked = current_date where itemId = :itemId")
     void updateLastRestocked(Long itemId);
-
-    @Modifying
-    @Query("Delete from Inventory where itemId = :itemId")
-    void deleteInventory(Long itemId);
-
-    @Modifying
-    @Query("Select * from Inventory")
-    List<Inventory> findAllInventory();
-
+   
     @Query("Select i from Inventory i where i.itemName = :itemName and i.brandName = :brandName ")
     Inventory findByItemNameAndBrandName(String itemName, String brandName);
     

@@ -4,7 +4,7 @@ import java.util.List;
 import com.hms.hospital_management_system.models.Inventory;
 import com.hms.hospital_management_system.jpaRepository.InventoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-
+import java.time.LocalDate;
 @Service    
 public class InventoryService {
 
@@ -66,6 +66,16 @@ public class InventoryService {
 
     public Inventory getInventoryByItemNameAndBrandName(String itemName, String brandName) {
         return inventoryRepository.findByItemNameAndBrandName(itemName, brandName);
+    }
+
+    // add method to get inventory by lastRestocked after a date
+    public List<Inventory> getInventoryByLastRestockedAfterDate(LocalDate date) {
+        return inventoryRepository.findByLastRestockedAfterDate(date);
+    }
+
+    // add method to get inventory by lastRestocked before a date
+    public List<Inventory> getInventoryByLastRestockedBeforeDate(LocalDate date) {
+        return inventoryRepository.findByLastRestockedBeforeDate(date);
     }
     
     
