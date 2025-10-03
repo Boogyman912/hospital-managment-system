@@ -32,7 +32,7 @@ public interface InpatientRepository extends JpaRepository<Inpatient, Long> {
     Inpatient findByAdmissionDateAfterAndCurrentlyAdmitted(java.time.LocalDate admissionDate);  
 
     //finding inpatient discharged on and before a specific date
-    @Query("SELECT i FROM Inpatient i WHERE i.dischargedDate <= :dischargeDate")
+    @Query("SELECT i FROM Inpatient i WHERE i.dischargeDate <= :dischargeDate")
     Inpatient findByDischargeDateBefore(java.time.LocalDate dischargeDate);
     
     @Query("SELECT i FROM Inpatient i WHERE i.room.roomId = :roomId")

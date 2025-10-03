@@ -1,9 +1,11 @@
 package com.hms.hospital_management_system.models;
+
 import jakarta.persistence.*;
 import java.time.LocalDate;
 
 // it is relation between patient and room , so it has foreign keys of both patient and room
-// is it still an entity ? yes because it has its own attributes like admission date , discharge date etc
+// is it still an entity ? yes because it has its own attributes like admission date , discharge
+// date etc
 // also it can have its own primary key , like inpatient id
 @Entity
 @Table(name = "inpatients")
@@ -12,10 +14,12 @@ public class Inpatient {
 
     // this model records stores the patient and room assigned to them
     // along with admission and discharge dates
-    //also mention annotations for jpa
+    // also mention annotations for jpa
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "inpatient_id")
     private Long inpatientId;
+
 
     @ManyToOne
     @JoinColumn(name = "patient_id")
@@ -25,23 +29,26 @@ public class Inpatient {
     @JoinColumn(name = "room_id")
     private Room room;
 
-    @Column(name = "admission_date",nullable = false)
+    @Column(name = "admission_date", nullable = false)
     private LocalDate admissionDate;
 
     // as discharge date can be null initially when patient is admitted
 
-    @Column(name = "discharge_date",nullable = true)
+    @Column(name = "discharge_date", nullable = true)
     private LocalDate dischargeDate;
 
-    @Column(name = "total_bill_amount",nullable = true)
+    @Column(name = "total_bill_amount", nullable = true)
     private Double totalBillAmount;
 
-    @Column(name = "is_billed",nullable = false)
+    @Column(name = "is_billed", nullable = false)
     private Boolean isBilled;
+
     public Inpatient() {
         // default constructor for jpa
     }
-    public Inpatient(Patient patient, Room room, LocalDate admissionDate, LocalDate dischargeDate, Double totalBillAmount, Boolean isBilled) {
+
+    public Inpatient(Patient patient, Room room, LocalDate admissionDate, LocalDate dischargeDate,
+            Double totalBillAmount, Boolean isBilled) {
         this.patient = patient;
         this.room = room;
         this.admissionDate = admissionDate;

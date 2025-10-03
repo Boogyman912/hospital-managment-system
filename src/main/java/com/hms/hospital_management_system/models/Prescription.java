@@ -3,6 +3,7 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime; 
 import java.time.LocalDate;
 import java.util.*;
+import com.hms.hospital_management_system.converter.ListMapToJsonConverter;
 @Entity
 @Table(name = "prescriptions")
 public class Prescription {
@@ -34,6 +35,7 @@ public class Prescription {
     //}
     //pricing will be considered in the inventory table and billing table
     @Column(columnDefinition = "json")
+    @Convert(converter = ListMapToJsonConverter.class)
     private List<Map<String,String>> medications; // JSON string
     //Tests should be provided in this format 
     //{
@@ -42,6 +44,7 @@ public class Prescription {
     //}
 
     @Column(columnDefinition = "json")
+    @Convert(converter = ListMapToJsonConverter.class)
     private List<Map<String,String>> labTests;
     // it will be a list of lab tests in json format
 

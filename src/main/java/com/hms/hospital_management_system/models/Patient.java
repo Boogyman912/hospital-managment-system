@@ -2,7 +2,6 @@ package com.hms.hospital_management_system.models;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
-import com.hms.hospital_management_system.models.EmergencyContact;
 
 
 

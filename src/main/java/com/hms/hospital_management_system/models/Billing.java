@@ -15,14 +15,18 @@ public class Billing {
 
     @OneToOne
     @JoinColumn(name = "prescription_id")
-    @Column(nullable = true)
     private Prescription prescription;
 
+    @ManyToOne
+    @JoinColumn(name = "patient_id")
     private Patient patient;
+
+
     @OneToMany
     @JoinColumn(name = "inpatient_id")
-    @Column(nullable = true)
     private List<Inpatient> inpatients;
+
+
     private Double totalAmount;
     
     private Status status;

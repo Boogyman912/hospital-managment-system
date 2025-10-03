@@ -13,7 +13,7 @@ public interface LabTestRepository extends JpaRepository<LabTest, Long> {
     LabTest findByTestNameAndTestType(String testName, String testType);
 
     @Modifying
-    @Query("DELETE lt FROM LabTest lt WHERE lt.testId = :testId")
+    @Query("DELETE FROM LabTest lt WHERE lt.testId = :testId")
 
     void deletebyId(Long testId);
 
