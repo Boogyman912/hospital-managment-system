@@ -55,15 +55,6 @@ public class BillingController {
         }
     }
 
-    @PostMapping("/pay/{bill_id}")
-    public ResponseEntity<Boolean> payBill(@PathVariable Long bill_id) {
-        try {
-            Boolean paidBill = billingService.payBill(bill_id);
-            return ResponseEntity.ok(paidBill);
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
-        }
-    }
 
     @GetMapping("/patient/{patient_id}/unpaid")
 
@@ -83,6 +74,16 @@ public class BillingController {
             return ResponseEntity.ok(bill);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @DeleteMapping("/delete/{bill_id}")
+    public ResponseEntity<String> deleteBill(@PathVariable Long bill_id) {
+        try {
+            billingService.deleteBill(bill_id);
+            return ResponseEntity.ok("Bill deleted successfully");
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error deleting bill");
         }
     }
 

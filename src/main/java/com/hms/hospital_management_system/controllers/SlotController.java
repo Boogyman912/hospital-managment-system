@@ -24,50 +24,56 @@ public class SlotController {
         List<Slot> slots = slotService.getAvailableSlotsByDoctorAndDate(doctor_id, appointmentDate);
         return ResponseEntity.ok(slots);
     }
-    
-    @PostMapping("/create")
-    public ResponseEntity<Map<String, Object>> createSlots(@RequestBody Map<String, Object> slotRequest) {
-        try {
-            Long doctor_id = Long.valueOf(slotRequest.get("doctor_id").toString());
-            String dateStr = slotRequest.get("date").toString();
-            // CHANGED: Postman sends JSON arrays as List, not String[]. Convert safely.
-            @SuppressWarnings("unchecked")
-            List<String> timeSlotsList = (List<String>) slotRequest.get("timeSlots");
-            if (timeSlotsList == null) {
-                return ResponseEntity.badRequest().body(Map.of(
-                    "success", false,
-                    "message", "timeSlots is required and must be an array of strings"
-                ));
-            }
-            String[] timeSlots = timeSlotsList.toArray(new String[0]);
-            Boolean isOnline = Boolean.valueOf(slotRequest.get("isOnline").toString());
-            
-            LocalDate date = LocalDate.parse(dateStr);
-            // CHANGED: use return value to confirm how many were saved
-            //print all time slots
-            // System.out.println("Time slots: ");
-            // for (String time : timeSlots) {
-            //     System.out.println("Time slot: " + time);
-            // }
-            int saved = slotService.createSlotsForDoctor(doctor_id, date, timeSlots, isOnline);
-            if (saved == 0) {
-                return ResponseEntity.badRequest().body(Map.of(
-                    "success", false,
-                    "message", "No slots were created. Check doctor_id, date, and timeSlots."
-                ));
-            }
-            return ResponseEntity.ok(Map.of(
-                "success", true,
-                "message", "Slots created successfully",
-                "count", saved
-            ));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of(
-                "success", false,
-                "message", "Error creating slots: " + e.getMessage()
-            ));
-        }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<Slot>> getAllSlots() {
+        List<Slot> slots = slotService.getAllSlots();
+        return ResponseEntity.ok(slots);
     }
+    
+    // @PostMapping("/create")
+    // public ResponseEntity<Map<String, Object>> createSlots(@RequestBody Map<String, Object> slotRequest) {
+    //     try {
+    //         Long doctor_id = Long.valueOf(slotRequest.get("doctor_id").toString());
+    //         String dateStr = slotRequest.get("date").toString();
+    //         // CHANGED: Postman sends JSON arrays as List, not String[]. Convert safely.
+    //         @SuppressWarnings("unchecked")
+    //         List<String> timeSlotsList = (List<String>) slotRequest.get("timeSlots");
+    //         if (timeSlotsList == null) {
+    //             return ResponseEntity.badRequest().body(Map.of(
+    //                 "success", false,
+    //                 "message", "timeSlots is required and must be an array of strings"
+    //             ));
+    //         }
+    //         String[] timeSlots = timeSlotsList.toArray(new String[0]);
+    //         Boolean isOnline = Boolean.valueOf(slotRequest.get("isOnline").toString());
+            
+    //         LocalDate date = LocalDate.parse(dateStr);
+    //         // CHANGED: use return value to confirm how many were saved
+    //         //print all time slots
+    //         // System.out.println("Time slots: ");
+    //         // for (String time : timeSlots) {
+    //         //     System.out.println("Time slot: " + time);
+    //         // }
+    //         int saved = slotService.createSlotsForDoctor(doctor_id, date, timeSlots, isOnline);
+    //         if (saved == 0) {
+    //             return ResponseEntity.badRequest().body(Map.of(
+    //                 "success", false,
+    //                 "message", "No slots were created. Check doctor_id, date, and timeSlots."
+    //             ));
+    //         }
+    //         return ResponseEntity.ok(Map.of(
+    //             "success", true,
+    //             "message", "Slots created successfully",
+    //             "count", saved
+    //         ));
+    //     } catch (Exception e) {
+    //         return ResponseEntity.badRequest().body(Map.of(
+    //             "success", false,
+    //             "message", "Error creating slots: " + e.getMessage()
+    //         ));
+    //     }
+    // }
     
     @PostMapping("/{slotId}/hold")
     public ResponseEntity<Map<String, Object>> holdSlot(@PathVariable Long slotId, @RequestParam(defaultValue = "15") int holdMinutes) {

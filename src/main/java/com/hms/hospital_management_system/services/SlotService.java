@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-
+import org.springframework.dao.DataIntegrityViolationException;
 @Service
 public class SlotService {
     
@@ -18,6 +18,24 @@ public class SlotService {
     @Autowired
     private DoctorService doctorService;
     
+    public List<Slot> getAllSlots() {
+        try {
+            return slotRepository.findAll();
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+            return null;
+        }
+    }
+
+    public Slot getSlotById(Long slotId) throws RuntimeException{
+        try{
+        Slot slot = slotRepository.findById(slotId).orElseThrow(()-> new RuntimeException("Slot with slotId "+ slotId + " not found"));
+        return slot;
+        }catch(RuntimeException e){
+            System.err.println("Error fetching slot: " + e.getMessage());
+            throw e;
+        }
+    }
     public List<Slot> getAvailableSlotsByDoctorAndDate(Long doctor_id, LocalDate date) {
         try {
             // CHANGED: repository method renamed to use explicit JPQL method name findByDoctorAndDateAndStatus
@@ -105,4 +123,26 @@ public class SlotService {
             return saved;
         }
     }
+
+    public void deleteSlotById(Long slotId) throws RuntimeException {
+    
+    // 1. Check if the slot exists first
+    if (!slotRepository.existsById(slotId)) {
+        throw new RuntimeException("Slot with ID " + slotId + " not found. Deletion failed.");
+    }
+
+    try {
+        // 2. Perform the deletion
+        slotRepository.deleteById(slotId);
+        
+    } catch (DataIntegrityViolationException e) {
+        // 3. Handle specific database errors (e.g., if this slot is referenced by an appointment)
+        throw new RuntimeException("Cannot delete slot with ID " + slotId + 
+                                   " due to existing appointments or related data.", e);
+        
+    } catch (Exception e) {
+        // 4. Catch any other unexpected exceptions
+        throw new RuntimeException("Failed to delete slot with ID " + slotId + ". Database error.", e);
+    }
+}
 }

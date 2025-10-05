@@ -23,6 +23,15 @@ public class AppointmentService {
     
     @Autowired
     private DoctorService doctorService;
+
+    public List<Appointment> getAllAppointments() {
+        try {
+            return appointmentRepository.findAll();
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+            return null;
+        }
+    }
     
     public List<Appointment> getAppointmentsByDoctorId(Long doctor_id) {
         try {
@@ -136,5 +145,19 @@ public class AppointmentService {
             System.out.println("Error: " + e.getMessage());
             return null;
         }
+    }
+
+    public Boolean isAppointmentWithDoctor(Long appointmentId,Long doctorId) throws RuntimeException{
+        Long doctor_id = appointmentRepository.findById(appointmentId)
+        .orElseThrow(() -> new RuntimeException("Appointment doesn't exist"))
+        .getDoctor()
+        .getDoctor_id();
+
+        return (doctorId == doctor_id);
+    }
+
+    public List<Appointment> findByPhoneNumber(String phoneNumber){
+        List<Appointment> appointment = appointmentRepository.findByPhoneNumber(phoneNumber);
+        return appointment;
     }
 }

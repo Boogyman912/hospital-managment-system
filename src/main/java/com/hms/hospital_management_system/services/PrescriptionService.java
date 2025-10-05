@@ -53,7 +53,7 @@ public class PrescriptionService {
     }
 
     public void deletePrescription(Long prescription_id) {
-        PrescriptionRepository.deletePrescription(prescription_id);
+        PrescriptionRepository.deleteById(prescription_id);
     }
 
     public List<Prescription> getAllPrescriptions() {

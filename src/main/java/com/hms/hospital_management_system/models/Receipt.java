@@ -1,5 +1,5 @@
 package com.hms.hospital_management_system.models;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -12,6 +12,7 @@ public class Receipt {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long receiptId;
 
+    @JsonIgnore
     @OneToOne
     @JoinColumn(name = "appointment_id")
     private Appointment appointment;

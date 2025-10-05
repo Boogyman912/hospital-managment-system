@@ -16,4 +16,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     // CHANGED: Use explicit JPQL to filter by nested Patient field named patientId
     @Query("SELECT a FROM Appointment a WHERE a.patient.patientId = :patientId")
     List<Appointment> findByPatientPatientId(@Param("patientId") Long patientId);
+
+    @Query("select a from Appointment a where a.patient.phoneNumber = :phoneNumber and a.appointmentStatus = AppointmentStatus.BOOKED")
+    List<Appointment> findByPhoneNumber(@Param("phoneNumber") String phoneNumber);
 }

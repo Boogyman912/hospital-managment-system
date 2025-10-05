@@ -65,6 +65,7 @@ public class InventoryService {
     }
 
     public Inventory getInventoryByItemNameAndBrandName(String itemName, String brandName) {
+        System.out.println("Fetching inventory for Item Name: " + itemName + ", Brand Name: " + brandName);
         return inventoryRepository.findByItemNameAndBrandName(itemName, brandName);
     }
 

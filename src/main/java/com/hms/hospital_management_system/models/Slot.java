@@ -3,6 +3,7 @@ package com.hms.hospital_management_system.models;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "slots")
@@ -12,6 +13,7 @@ public class Slot {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long slotId;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "doctor_id", nullable = false)
     private Doctor doctor;

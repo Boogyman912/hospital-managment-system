@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 @RestController
-@RequestMapping("/api/prescriptions")
+@RequestMapping("/api/staff/prescriptions")
 
 public class PrescriptionController {
     @Autowired
@@ -62,52 +62,22 @@ public class PrescriptionController {
         }
     }
 
-    @PostMapping("/create")
-    public ResponseEntity<String> createPrescription(@RequestBody Prescription prescription) {
-        try {
-            prescriptionService.createPrescription(prescription);
-            return ResponseEntity.ok("Prescription created successfully");
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("Error creating prescription: " + e.getMessage());
-        }
-    }
+    // @PostMapping("/create")
+    // public ResponseEntity<Map<String, Object>> createPrescription(@RequestBody Prescription prescription) {
+    //     Map<String, Object> response = new HashMap<>();
+    //     try {
+    //         Prescription createdPrescription = prescriptionService.createPrescription(prescription);
+    //         response.put("message", "Prescription created successfully");
+    //         response.put("prescription", createdPrescription);
+    //         return ResponseEntity.ok(response);
+    //     } catch (Exception e) {
+    //         response.put("message", "Error creating prescription: " + e.getMessage());
+    //         response.put("prescription", null);
+    //         return ResponseEntity.status(500).body(response);
+    //     }
+    // }
     
-    @PatchMapping("/update/{prescription_id}")
-    public ResponseEntity<String> updatePrescription(@PathVariable Long prescription_id, @RequestBody Prescription prescription) {
-        try {
-            List<Map<String,String>> medications = prescription.getMedications();
-            List<Map<String,String>> labTests = prescription.getLabTests();
-            String instructions = prescription.getInstructions();
-            LocalDate date_issued = prescription.getDateIssued();
-            prescriptionService.updatePrescription(prescription_id, medications, labTests, instructions, date_issued);
-            return ResponseEntity.ok("Prescription updated successfully");
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("Error updating prescription: " + e.getMessage());
-        }
-    }
-
-    @GetMapping("/{prescription_id}")
-    public ResponseEntity<?> getPrescriptionById(@PathVariable Long prescription_id) {
-        try {
-            Prescription prescription = prescriptionService.getPrescriptionById(prescription_id);
-            if (prescription == null) {
-                return ResponseEntity.notFound().build();
-            }
-            return ResponseEntity.ok(prescription);
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("Error retrieving prescription: " + e.getMessage());
-        }
-    }
-
-    @DeleteMapping("/delete/{prescription_id}")
-    public ResponseEntity<String> deletePrescription(@PathVariable Long prescription_id) {
-        try {
-            prescriptionService.deletePrescription(prescription_id);
-            return ResponseEntity.ok("Prescription deleted successfully");
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("Error deleting prescription: " + e.getMessage());
-        }
-    }
+    
 
     @GetMapping("/all")
     public ResponseEntity<?> getAllPrescriptions() {

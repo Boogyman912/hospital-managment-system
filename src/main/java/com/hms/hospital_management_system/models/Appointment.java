@@ -1,6 +1,7 @@
 package com.hms.hospital_management_system.models;
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 @Entity
 @Table(name = "appointments")
 public class Appointment {
@@ -9,14 +10,17 @@ public class Appointment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long appointmentId;
 
+    // @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "doctor_id", nullable = false)
     private Doctor doctor;
 
+    // @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "patient_id", nullable = false)
     private Patient patient;
 
+    // @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "slot_id")
     private Slot slot;
@@ -38,7 +42,7 @@ public class Appointment {
     private Receipt receipt;
 
     public enum AppointmentStatus {
-        BOOKED, COMPLETED, CANCELLED, ISSUE_RAISED
+        BOOKED, COMPLETED, CANCELLED
     }
 
 public Appointment() {

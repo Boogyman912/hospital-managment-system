@@ -34,9 +34,7 @@ public interface PrescriptionRepository extends JpaRepository<Prescription, Long
                             @Param("instructions") String instructions,
                             @Param("dateIssued") LocalDate dateIssued);
 
-    @Modifying
-    @Query("DELETE FROM Prescription p WHERE p.prescriptionId = :prescriptionId")
-    void deletePrescription(@Param("prescriptionId") Long prescriptionId);
+   
 
     @Query("SELECT p FROM Prescription p")
     List<Prescription> findAllPrescriptions();

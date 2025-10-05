@@ -8,7 +8,7 @@ import com.hms.hospital_management_system.services.InpatientService;
 
 
 @RestController
-@RequestMapping("/api/inpatients")
+@RequestMapping("/api/staff/inpatients")
 public class InpatientController {
 
     @Autowired

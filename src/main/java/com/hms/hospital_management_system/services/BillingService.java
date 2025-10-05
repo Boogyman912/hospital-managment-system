@@ -38,25 +38,29 @@ public class BillingService {
             Double amount = 0.0;
             List<Map<String, String>> meds = billing.getPrescription().getMedications();
             List<Map<String, String>> labTest = billing.getPrescription().getLabTests();
-
+            System.out.println("\n\n\n\nMedications to process: " + meds.size());
             for (Map<String, String> med : meds) {
-            Inventory item = inventoryService.getInventoryByItemNameAndBrandName(med.get("itemName"), med.get("brandName"));
-            if (item != null) {
-                Double unitPrice = item.getUnitPrice();
-                Integer quantity = Integer.parseInt(med.get("quantity"));
-                quantity = quantity >= item.getQuantity() ? item.getQuantity() : quantity; // Ensure we don't go negative
-                amount += unitPrice * quantity;
-                inventoryService.decreaseQuantity(item.getItemId(), quantity);
-            }
+                System.out.println("Processing medication: " + med.get("itemName") + " - " + med.get("brandName ") );
+                Inventory item = inventoryService.getInventoryByItemNameAndBrandName(med.get("itemName"), med.get("brandName"));
+                if (item != null) {
+                    Double unitPrice = item.getUnitPrice();
+                    Integer quantity = Integer.parseInt(med.get("quantity"));
+                    quantity = quantity >= item.getQuantity() ? item.getQuantity() : quantity; // Ensure we don't go negative
+                    System.out.println("\n\n\n\n\n\n\n\n\n\nItem: " + item.getItemName() + ", Unit Price: " + unitPrice + ", Quantity: " + quantity);
+                    amount += unitPrice * quantity;
+                    inventoryService.decreaseQuantity(item.getItemId(), quantity);
+                }
             }
 
             for (Map<String, String> test : labTest) {
             LabTest lab = labTestService.getLabTestByNameAndType(test.get("testName"), test.get("testType"));
             if (lab != null) {
                 Double testCost = lab.getTestCost();
+                System.out.println("Lab Test: " + lab.getTestName() + ", Test Cost: " + testCost);
                 amount += testCost;
             }
             }
+            System.out.println("For prescription with prescriptionId "+ prescription_Id +" Total amount calculated: " + amount);
             billing.setPatient(prescriptionService.getPrescriptionById(prescription_Id).getPatient());
             billing.setTotalAmount(amount);
             billing.setStatus(Billing.Status.UNPAID);
@@ -166,5 +170,10 @@ public class BillingService {
             }
         }
         return unpaidBills;
+    }
+    
+
+    public void deleteBill(Long billId) {
+        billingRepository.deleteById(billId);
     }
 }

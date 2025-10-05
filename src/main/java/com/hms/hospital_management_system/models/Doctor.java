@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "doctors")
 public class Doctor {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "doctor_id")
@@ -16,12 +16,6 @@ public class Doctor {
 
     @Column(name = "specialization")
     private String specialization;
-
-    @Column(name = "username", length = 100, unique = true, nullable = false)
-    private String username;
-
-    @Column(name = "hashedpassword", length = 255, nullable = false)
-    private String hashedpassword;
 
     @Column(name = "email", length = 100, unique = true, nullable = false)
     private String email;
@@ -40,11 +34,9 @@ public class Doctor {
     public Doctor() {
     }
 
-    public Doctor(String name, String specialization, String username, String hashedpassword, String email, String phone_number, Boolean active) {
+    public Doctor(String name, String specialization, String email, String phone_number, Boolean active) {
         this.name = name;
         this.specialization = specialization;
-        this.username = username;
-        this.hashedpassword = hashedpassword;
         this.email = email;
         this.phone_number = phone_number;
         this.active = active;
@@ -70,19 +62,7 @@ public class Doctor {
     public void setSpecialization(String specialization) {
         this.specialization = specialization;
     }
-    public String getUsername() {
-        return username;
-    }
-    public void setUsername(String username) {
-        this.username = username;
-    }
-    public String getHashedpassword() {
-        return hashedpassword;
-    }
-    public void setHashedpassword(String hashedpassword) {
-        this.hashedpassword = hashedpassword;
-    }
-
+ 
     public String getEmail() {
     return email;
 }

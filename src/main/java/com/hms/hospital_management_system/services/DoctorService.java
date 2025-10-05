@@ -21,11 +21,12 @@ public class DoctorService {
         return null;
     }
 
-    public void createDoctor(Doctor doctor) {
+    public Doctor createDoctor(Doctor doctor)  throws Exception{
         // logic to create a new doctor
         try {
-           doctorRepository.save(doctor);
-           System.out.println("Successfully created a new doctor!!!");
+            System.out.println("Successfully created a new doctor!!!");
+            return doctorRepository.save(doctor);
+           
         } catch (Exception e) {
             System.out.println( "Error: " + e.getMessage());
             throw e;

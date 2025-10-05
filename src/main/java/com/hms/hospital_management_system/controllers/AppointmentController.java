@@ -10,8 +10,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import com.hms.hospital_management_system.models.Slot;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpEntity;
 
 @RestController
 @RequestMapping("/api/appointments")
@@ -23,26 +21,18 @@ public class AppointmentController {
     @Autowired
     private SlotService slotService;
 
-    @GetMapping("/doctor/{doctor_id}")
-    public ResponseEntity<List<Appointment>> getAppointmentsByDoctor(@PathVariable Long doctor_id) {
-        List<Appointment> appointments = appointmentService.getAppointmentsByDoctorId(doctor_id);
-        return ResponseEntity.ok(appointments);
-    }
+   
+    // @GetMapping("/doctor/{doctor_id}")
+    // public ResponseEntity<List<Appointment>> getAppointmentsByDoctor(@PathVariable Long doctor_id) {
+    //     List<Appointment> appointments = appointmentService.getAppointmentsByDoctorId(doctor_id);
+    //     return ResponseEntity.ok(appointments);
+    // }
 
-    @GetMapping("/patient/{patientId}")
-    public ResponseEntity<List<Appointment>> getAppointmentsByPatient(@PathVariable Long patientId) {
-        List<Appointment> appointments = appointmentService.getAppointmentsByPatientId(patientId);
-        return ResponseEntity.ok(appointments);
-    }
+
+
     
-    @GetMapping("/{appointmentId}")
-    public ResponseEntity<Appointment> getAppointmentById(@PathVariable Long appointmentId) {
-        Appointment appointment = appointmentService.getAppointmentById(appointmentId);
-        if (appointment != null) {
-            return ResponseEntity.ok(appointment);
-        }
-        return ResponseEntity.notFound().build();
-    }
+    
+    
     
     @GetMapping("/slots/doctor/{doctor_id}/date/{date}")
     public ResponseEntity<List<com.hms.hospital_management_system.models.Slot>> getAvailableSlots(
@@ -117,19 +107,5 @@ public class AppointmentController {
         }
     }
     
-    @PostMapping("/{appointmentId}/cancel")
-    public ResponseEntity<Map<String, Object>> cancelAppointment(@PathVariable Long appointmentId) {
-        try {
-            appointmentService.cancelAppointment(appointmentId);
-            return ResponseEntity.ok(Map.of(
-                "success", true,
-                "message", "Appointment cancelled successfully"
-            ));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of(
-                "success", false,
-                "message", "Error cancelling appointment: " + e.getMessage()
-            ));
-        }
-    }
+    
 }

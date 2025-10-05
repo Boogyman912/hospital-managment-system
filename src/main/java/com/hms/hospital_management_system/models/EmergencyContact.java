@@ -11,6 +11,7 @@ public class EmergencyContact {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long contactId;
 
+    
     @ManyToOne
     @JoinColumn(name = "patient_id")
     private Patient patient;

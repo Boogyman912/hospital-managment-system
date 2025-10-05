@@ -3,6 +3,7 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime; 
 import java.time.LocalDate;
 import java.util.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.hms.hospital_management_system.converter.ListMapToJsonConverter;
 @Entity
 @Table(name = "prescriptions")
@@ -12,14 +13,17 @@ public class Prescription {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long prescriptionId;
 
-    @ManyToOne
+    @JsonIgnore
+    @OneToOne
     @JoinColumn(name = "appointment_id")
     private Appointment appointment;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "patient_id")
     private Patient patient;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "doctor_id")
     private Doctor doctor; // CHANGED: Use Doctor instead of Staff
@@ -28,9 +32,9 @@ public class Prescription {
     //because we want to store the medications in a json format
     //the json format will be like this:
     //{
-    //    "medication_name": "medication_name",
-    //     "medication_brand": "medication_brand",
-    //    "medication_quantity": "medication_quantity",
+    //    "itemName": "medication_name",
+    //    "brandName": "medication_brand",
+    //    "quantity": "medication_quantity",
     //    "medication_instructions": "medication_instructions"
     //}
     //pricing will be considered in the inventory table and billing table
@@ -39,8 +43,8 @@ public class Prescription {
     private List<Map<String,String>> medications; // JSON string
     //Tests should be provided in this format 
     //{
-    //    "test_name": "test_name",
-    //     "test_type": "test_type",
+    //    "testName": "test_name",
+    //     "testType": "test_type",
     //}
 
     @Column(columnDefinition = "json")
@@ -56,14 +60,14 @@ public class Prescription {
     public Prescription() {
     }
 
-    public Prescription(Appointment appointment, Patient patient, Doctor doctor, List<Map<String,String>> medications, List<Map<String,String>> labTests, String instructions, LocalDate dateIssued) {
+    public Prescription(Appointment appointment, Patient patient, Doctor doctor, List<Map<String,String>> medications, List<Map<String,String>> labTests, String instructions) {
         this.appointment = appointment;
         this.patient = patient;
         this.doctor = doctor;
         this.medications = medications;
         this.labTests = labTests;
         this.instructions = instructions;
-        this.dateIssued = dateIssued;
+        this.dateIssued = LocalDate.now();
     }
 
     public Long getPrescriptionId() {

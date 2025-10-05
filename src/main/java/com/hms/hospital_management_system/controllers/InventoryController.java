@@ -7,7 +7,7 @@ import com.hms.hospital_management_system.models.Inventory;
 import com.hms.hospital_management_system.services.InventoryService;
 
 @RestController
-@RequestMapping("/api/inventory")
+@RequestMapping("/api/staff/inventory")
 public class InventoryController {
 
     @Autowired
