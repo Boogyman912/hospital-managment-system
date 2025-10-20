@@ -7,259 +7,269 @@ import { apiGet, apiPost } from "./api.js";
 
 // Fallback mock data when backend returns no doctors or errors
 const mockDoctors = [
-  { doctor_id: 101, name: "Dr. Mock One", specialization: "General Medicine" },
-  { doctor_id: 102, name: "Dr. Mock Two", specialization: "Pediatrics" },
-  { doctor_id: 103, name: "Dr. Mock Three", specialization: "Dermatology" },
+    { doctor_id: 101, name: "Dr. Mock One", specialization: "General Medicine" },
+    { doctor_id: 102, name: "Dr. Mock Two", specialization: "Pediatrics" },
+    { doctor_id: 103, name: "Dr. Mock Three", specialization: "Dermatology" },
 ];
 
 // Doctors list is fetched from backend only
 
 // --- SVG Icon for Default Avatar ---
 const DoctorIcon = () => (
-  <svg
-    className="w-16 h-16 text-gray-400"
-    fill="currentColor"
-    viewBox="0 0 20 20"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path
-      fillRule="evenodd"
-      d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-      clipRule="evenodd"
-    ></path>
-  </svg>
+    <svg
+        className="w-16 h-16 text-gray-400"
+        fill="currentColor"
+        viewBox="0 0 20 20"
+        xmlns="http://www.w3.org/2000/svg"
+    >
+        <path
+            fillRule="evenodd"
+            d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+            clipRule="evenodd"
+        ></path>
+    </svg>
 );
 
 // --- Doctor Card Component ---
 const DoctorCard = ({ doctor, onBook }) => {
-  return (
-    <div className="bg-gray-800 rounded-xl p-6 flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6 transform hover:scale-105 transition-transform duration-300 shadow-lg">
-      {/* Always show default icon (backend doesn't provide profile pics) */}
-      <div className="flex-shrink-0 w-24 h-24 rounded-full bg-gray-700 flex items-center justify-center overflow-hidden">
-        <DoctorIcon />
-      </div>
-      {/* Doctor Info */}
-      <div className="flex-1 text-center sm:text-left">
-        <h3 className="text-2xl font-bold text-white">{doctor.name}</h3>
-        <p className="text-blue-300 text-md">{doctor.specialization}</p>
-      </div>
-      {/* Book Appointment Button */}
-      <div className="flex-shrink-0">
-        <button
-          onClick={() => onBook(doctor)}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-        >
-          Book Appointment
-        </button>
-      </div>
-    </div>
-  );
+    return (
+        <div className="bg-gray-800 rounded-xl p-6 flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6 transform hover:scale-105 transition-transform duration-300 shadow-lg">
+            {/* Always show default icon (backend doesn't provide profile pics) */}
+            <div className="flex-shrink-0 w-24 h-24 rounded-full bg-gray-700 flex items-center justify-center overflow-hidden">
+                <DoctorIcon />
+            </div>
+            {/* Doctor Info */}
+            <div className="flex-1 text-center sm:text-left">
+                <h3 className="text-2xl font-bold text-white">{doctor.name}</h3>
+                <p className="text-blue-300 text-md">{doctor.specialization}</p>
+            </div>
+            {/* Book Appointment Button */}
+            <div className="flex-shrink-0">
+                <button
+                    onClick={() => onBook(doctor)}
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                >
+                    Book Appointment
+                </button>
+            </div>
+        </div>
+    );
 };
 
 // --- Main Doctors List Page Component ---
 export default function DoctorsListPage() {
-  const [selectedDoctor, setSelectedDoctor] = useState(null);
-  const [doctors, setDoctors] = useState([]);
-  const [loadingDoctors, setLoadingDoctors] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-  const [form, setForm] = useState({
-    name: "",
-    phone_number: "",
-    email: "",
-    sex: "",
-    emergency_contact_id: "",
-  });
-
-  React.useEffect(() => {
-    let cancelled = false;
-    async function load() {
-      try {
-        setLoadingDoctors(true);
-        const data = await apiGet("/api/doctors/");
-        if (!cancelled) {
-          const list = Array.isArray(data) ? data : data?.doctors || [];
-          setDoctors(list.length > 0 ? list : mockDoctors);
-        }
-      } catch (e) {
-        if (!cancelled) setDoctors(mockDoctors);
-      } finally {
-        if (!cancelled) setLoadingDoctors(false);
-      }
-    }
-    load();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  function handleOpenForm(doctor) {
-    setSelectedDoctor(doctor);
-    setError("");
-    setSuccess("");
-  }
-
-  function handleChange(e) {
-    const { name, value } = e.target;
-    setForm((f) => ({ ...f, [name]: value }));
-  }
-
-  async function handleSubmit(e) {
-    e.preventDefault();
-    if (!selectedDoctor) return;
-    setSubmitting(true);
-    setError("");
-    setSuccess("");
-    try {
-      // patient_id is PK auto-generated by backend
-      const payload = {
-        name: form.name,
-        phoneNumber: form.phone_number,
-        email: form.email || null,
-        sex: form.sex,
-        dob: form.dob || null,
-      };
-      await apiPost("/api/patients/create", payload);
-      setSuccess("Appointment booked successfully");
-      setSelectedDoctor(null);
-      setForm({
+    const [selectedDoctor, setSelectedDoctor] = useState(null);
+    const [doctors, setDoctors] = useState([]);
+    const [loadingDoctors, setLoadingDoctors] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
+    const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
+    const [form, setForm] = useState({
         name: "",
         phone_number: "",
         email: "",
         sex: "",
         emergency_contact_id: "",
-        dob: "",
-      });
-    } catch (err) {
-      setError(err.message || "Something went wrong");
-    } finally {
-      setSubmitting(false);
+    });
+
+    React.useEffect(() => {
+        let cancelled = false;
+        async function load() {
+            try {
+                setLoadingDoctors(true);
+                console.log("[load doctors] fetching from /api/home/doctors...");
+                const data = await apiGet("/api/home/doctors");
+                console.log("[load doctors] raw response:", data);
+                if (cancelled) return;
+                const list = Array.isArray(data) ? data : Array.isArray(data?.doctors) ? data.doctors : [];
+                if (list.length === 0) {
+                    console.warn("[load doctors] No doctors received, using mock data");
+                    setDoctors(mockDoctors);
+                } else {
+                    console.log(`[load doctors] Loaded ${list.length} doctors`);
+                    setDoctors(list);
+                }
+            }
+            catch (e) {
+                console.error("[load doctors] error:", e);
+                if (!cancelled) setDoctors(mockDoctors);
+            }
+            finally {
+                if (!cancelled) setLoadingDoctors(false);
+            }
+        }
+        load();
+        return () => {
+            cancelled = true;
+        };
+    }, []);
+
+    function handleOpenForm(doctor) {
+        setSelectedDoctor(doctor);
+        setError("");
+        setSuccess("");
     }
-  }
 
-  return (
-    <div className="bg-gray-900 min-h-screen flex flex-col">
-      <Header />
-      <div className="px-4 sm:px-8 py-8">
-        <h1 className="text-4xl sm:text-5xl font-bold text-white text-center mb-10">
-          Find a Doctor
-        </h1>
-        {success && (
-          <p className="text-green-400 text-center mb-4">{success}</p>
-        )}
-        {error && <p className="text-red-400 text-center mb-4">{error}</p>}
-        <div className="space-y-6">
-          {loadingDoctors && (
-            <p className="text-gray-400 text-center">Loading doctors...</p>
-          )}
-          {!loadingDoctors && (!doctors || doctors.length === 0) && (
-            <p className="text-gray-500 text-center">No doctors found.</p>
-          )}
-          {(doctors || []).map((doctor) => (
-            <DoctorCard
-              key={doctor.doctor_id || doctor.id || doctor._id}
-              doctor={doctor}
-              onBook={handleOpenForm}
-            />
-          ))}
-        </div>
-      </div>
+    function handleChange(e) {
+        const { name, value } = e.target;
+        setForm((f) => ({ ...f, [name]: value }));
+    }
 
-      {selectedDoctor && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center px-4">
-          <div className="bg-gray-800 w-full max-w-lg rounded-xl p-6 text-white">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold">
-                Book with {selectedDoctor.name}
-              </h2>
-              <button
-                className="text-gray-400 hover:text-white"
-                onClick={() => setSelectedDoctor(null)}
-              >
-                ✕
-              </button>
+    async function handleSubmit(e) {
+        e.preventDefault();
+        if (!selectedDoctor) return;
+        setSubmitting(true);
+        setError("");
+        setSuccess("");
+        try {
+            // patient_id is PK auto-generated by backend
+            const payload = {
+                name: form.name,
+                phoneNumber: form.phone_number,
+                email: form.email || null,
+                sex: form.sex,
+                dob: form.dob || null,
+            };
+            await apiPost("/api/patients/create", payload);
+            setSuccess("Appointment booked successfully");
+            setSelectedDoctor(null);
+            setForm({
+                name: "",
+                phone_number: "",
+                email: "",
+                sex: "",
+                emergency_contact_id: "",
+                dob: "",
+            });
+        } catch (err) {
+            setError(err.message || "Something went wrong");
+        } finally {
+            setSubmitting(false);
+        }
+    }
+
+    return (
+        <div className="bg-gray-900 min-h-screen flex flex-col">
+            <Header />
+            <div className="px-4 sm:px-8 py-8">
+                <h1 className="text-4xl sm:text-5xl font-bold text-white text-center mb-10">
+                    Find a Doctor
+                </h1>
+                {success && (
+                    <p className="text-green-400 text-center mb-4">{success}</p>
+                )}
+                {error && <p className="text-red-400 text-center mb-4">{error}</p>}
+                <div className="space-y-6">
+                    {loadingDoctors && (
+                        <p className="text-gray-400 text-center">Loading doctors...</p>
+                    )}
+                    {!loadingDoctors && (!doctors || doctors.length === 0) && (
+                        <p className="text-gray-500 text-center">No doctors found.</p>
+                    )}
+                    {(doctors || []).map((doctor) => (
+                        <DoctorCard
+                            key={doctor.doctor_id || doctor.id || doctor._id}
+                            doctor={doctor}
+                            onBook={handleOpenForm}
+                        />
+                    ))}
+                </div>
             </div>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm mb-1">Name</label>
-                <input
-                  name="name"
-                  value={form.name}
-                  onChange={handleChange}
-                  required
-                  className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3"
-                />
-              </div>
-              <div>
-                <label className="block text-sm mb-1">Phone Number</label>
-                <input
-                  name="phone_number"
-                  value={form.phone_number}
-                  onChange={handleChange}
-                  required
-                  className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3"
-                />
-              </div>
-              <div>
-                <label className="block text-sm mb-1">Date of Birth</label>
-                <input
-                  type="date"
-                  name="dob"
-                  value={form.dob || ""}
-                  onChange={handleChange}
-                  className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3"
-                />
-              </div>
-              <div>
-                <label className="block text-sm mb-1">Email (optional)</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={form.email}
-                  onChange={handleChange}
-                  className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3"
-                />
-              </div>
-              <div>
-                <label className="block text-sm mb-1">Sex</label>
-                <select
-                  name="sex"
-                  value={form.sex}
-                  onChange={handleChange}
-                  required
-                  className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3"
-                >
-                  <option value="" disabled>
-                    Select
-                  </option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                  <option value="other">Other</option>
-                </select>
-              </div>
-              {/* emergency_contact_id removed from payload per latest schema */}
-              <div className="flex justify-end gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setSelectedDoctor(null)}
-                  className="bg-gray-700 hover:bg-gray-600 px-5 py-2 rounded-lg"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="bg-blue-600 hover:bg-blue-700 disabled:opacity-60 px-5 py-2 rounded-lg"
-                >
-                  {submitting ? "Booking..." : "Confirm Booking"}
-                </button>
-              </div>
-            </form>
-          </div>
+
+            {selectedDoctor && (
+                <div className="fixed inset-0 bg-black/70 flex items-center justify-center px-4">
+                    <div className="bg-gray-800 w-full max-w-lg rounded-xl p-6 text-white">
+                        <div className="flex items-center justify-between mb-4">
+                            <h2 className="text-xl font-semibold">
+                                Book with {selectedDoctor.name}
+                            </h2>
+                            <button
+                                className="text-gray-400 hover:text-white"
+                                onClick={() => setSelectedDoctor(null)}
+                            >
+                                ✕
+                            </button>
+                        </div>
+                        <form onSubmit={handleSubmit} className="space-y-4">
+                            <div>
+                                <label className="block text-sm mb-1">Name</label>
+                                <input
+                                    name="name"
+                                    value={form.name}
+                                    onChange={handleChange}
+                                    required
+                                    className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm mb-1">Phone Number</label>
+                                <input
+                                    name="phone_number"
+                                    value={form.phone_number}
+                                    onChange={handleChange}
+                                    required
+                                    className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm mb-1">Date of Birth</label>
+                                <input
+                                    type="date"
+                                    name="dob"
+                                    value={form.dob || ""}
+                                    onChange={handleChange}
+                                    className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm mb-1">Email (optional)</label>
+                                <input
+                                    type="email"
+                                    name="email"
+                                    value={form.email}
+                                    onChange={handleChange}
+                                    className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm mb-1">Sex</label>
+                                <select
+                                    name="sex"
+                                    value={form.sex}
+                                    onChange={handleChange}
+                                    required
+                                    className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3"
+                                >
+                                    <option value="" disabled>
+                                        Select
+                                    </option>
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            {/* emergency_contact_id removed from payload per latest schema */}
+                            <div className="flex justify-end gap-3 pt-2">
+                                <button
+                                    type="button"
+                                    onClick={() => setSelectedDoctor(null)}
+                                    className="bg-gray-700 hover:bg-gray-600 px-5 py-2 rounded-lg"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={submitting}
+                                    className="bg-blue-600 hover:bg-blue-700 disabled:opacity-60 px-5 py-2 rounded-lg"
+                                >
+                                    {submitting ? "Booking..." : "Confirm Booking"}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+            <Footer />
         </div>
-      )}
-      <Footer />
-    </div>
-  );
+    );
 }
