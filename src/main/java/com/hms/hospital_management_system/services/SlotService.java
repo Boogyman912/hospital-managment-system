@@ -45,6 +45,16 @@ public class SlotService {
             return null;
         }
     }
+
+    public List<Slot> getAvailableSlotsByDoctor(Long doctor_id){
+        try {
+            // CHANGED: repository method renamed to use explicit JPQL method name findByDoctorAndDateAndStatus
+            return slotRepository.findByDoctorAndStatus(doctor_id,Slot.SlotStatus.AVAILABLE);
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+            return null;
+        }
+    }
     
     public Slot holdSlot(Long slotId, int holdMinutes) {
         try {

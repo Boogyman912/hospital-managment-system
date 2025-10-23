@@ -5,17 +5,22 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import com.hms.hospital_management_system.models.Patient;
 import com.hms.hospital_management_system.models.Prescription;
+import com.hms.hospital_management_system.models.Slot;
 import com.hms.hospital_management_system.models.Appointment.AppointmentStatus;
+import com.hms.hospital_management_system.models.Billing;
 import com.hms.hospital_management_system.models.Doctor;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.hms.hospital_management_system.services.BillingService;
 import com.hms.hospital_management_system.services.PatientService;
 import com.hms.hospital_management_system.services.AppointmentService;
 import com.hms.hospital_management_system.services.PrescriptionService;
+import com.hms.hospital_management_system.services.SlotService;
 import com.hms.hospital_management_system.services.DoctorService;
+import com.hms.hospital_management_system.services.InpatientService;
 import java.util.*;
 import com.hms.hospital_management_system.models.Appointment;
 import java.lang.RuntimeException;
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/api/home")
@@ -36,6 +41,11 @@ public class PatientController {
     @Autowired
     private DoctorService doctorService;
 
+    @Autowired
+    private InpatientService inpatientService;
+
+    @Autowired
+    private SlotService slotService;
     // @GetMapping("/")
     // public ResponseEntity<List<Patient>> getAllPatients() {
     // List<Patient> patients = patientService.getAllPatients();
@@ -50,14 +60,15 @@ public class PatientController {
     // }
     // return ResponseEntity.notFound().build();
     // }
-//**************************************************************
+    // **************************************************************
     // Assuming every patient his own phone number
     @PostMapping("/addpatient")
     public ResponseEntity<?> createPatient(@RequestBody Patient patient) {
         try {
             Optional<Patient> existingPatient =
                     patientService.findByPhoneNumber(patient.getPhoneNumber());
-            if (existingPatient != null) {
+                    System.out.println(existingPatient);
+            if (!existingPatient.isEmpty()) {
                 return ResponseEntity.ok().body(
                         Map.of("message", "Patient already exist", "patient", existingPatient));
             }
@@ -69,31 +80,46 @@ public class PatientController {
         }
     }
 
-    @GetMapping("/appointment/{phone_number}")
-    // those are not completed
-    public ResponseEntity<List<Appointment>> getAppoinmentByPhoneNumber(
-            @PathVariable String phoneNumber) throws RuntimeException {
+    @GetMapping("/appointment/{phoneNumber}")
+public ResponseEntity<?> getAppointmentByPhoneNumber(@PathVariable String phoneNumber) {
+    try {
+        System.out.println("Fetching Appointments for: " + phoneNumber);
 
-        // 1. Get the list of appointments. Assume the service returns a List<Appointment>
+        // Fetch appointments from the service
         List<Appointment> appointments = appointmentService.findByPhoneNumber(phoneNumber);
+
+        // Filter only the ones that are not completed (status = BOOKED)
         List<Appointment> incompleteAppointments = new ArrayList<>();
-        for(Appointment appointment : appointments){
-            if(appointment.getAppointmentStatus() == AppointmentStatus.BOOKED){
+        System.out.println(appointments.size());
+        for (Appointment appointment : appointments) {
+            if (appointment.getAppointmentStatus() == AppointmentStatus.BOOKED) {
                 incompleteAppointments.add(appointment);
             }
         }
-        
 
-        // 2. Check if the list is empty (no appointments found for the number)
+        // If no appointments found, return 404 response
         if (incompleteAppointments.isEmpty()) {
-            // Throw a Spring exception that maps to HTTP 404 Not Found
-            throw new UsernameNotFoundException(
-                    "No appointments found for phone number: " + phoneNumber);
+            return ResponseEntity.status(404).body(Map.of(
+                "success", false,
+                "message", "No appointments found for phone number: " + phoneNumber
+            ));
         }
 
-        // 3. Return the list with HTTP 200 OK
-        return ResponseEntity.ok(incompleteAppointments);
+        // Return the filtered list
+        return ResponseEntity.ok(Map.of(
+            "success", true,
+            "appointments", incompleteAppointments
+        ));
+
+    } catch (Exception e) {
+        // Handle any unexpected errors
+        return ResponseEntity.status(500).body(Map.of(
+            "success", false,
+            "message", "Error retrieving appointments: " + e.getMessage()
+        ));
     }
+}
+
 
     @GetMapping("/patient/prescription/{phoneNumber}")
     public ResponseEntity<?> getPrescriptionsByPatient(@PathVariable String phoneNumber)
@@ -112,6 +138,40 @@ public class PatientController {
         }
     }
 
+    @PostMapping("/generatebillforprescription/{prescription_id}")
+    public ResponseEntity<Billing> generateBillByPrescription(@PathVariable Long prescription_id) {
+        try {
+            Billing bill = billingService.generateBillByPrescriptionId(prescription_id);
+            return ResponseEntity.ok(bill);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @GetMapping("/patient/unpaid/bills/{phoneNumber}")
+
+    public ResponseEntity<List<Billing>> getUnpaidBillsByPatientPhoneNumber(
+            @PathVariable String phoneNumber) throws RuntimeException {
+        try {
+            Long patient_id = patientService.findByPhoneNumber(phoneNumber).orElseThrow(
+                    () -> new UsernameNotFoundException("No user exist with this phone number"))
+                    .getPatientId();
+            List<Billing> unpaidBills = billingService.getUnpaidBillsByPatientId(patient_id);
+            return ResponseEntity.ok(unpaidBills);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+     @PostMapping("/generatebillforinpatient/patient/{phoneNumber}")
+    public ResponseEntity<Billing> generateBillByInpatient(@PathVariable Long patient_id) {
+        try {
+            Billing bill = inpatientService.generateInpatientBillForPatient(patient_id);
+            return ResponseEntity.ok(bill);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
 
     @PostMapping("/pay/{bill_id}")
     public ResponseEntity<Boolean> payBill(@PathVariable Long bill_id) {
@@ -126,6 +186,7 @@ public class PatientController {
     // public end points
     @GetMapping("/doctors")
     public ResponseEntity<List<Doctor>> getAllDoctors() {
+        System.out.println("Yo wassup");
         List<Doctor> doctors = doctorService.getAllDoctors();
         return ResponseEntity.ok(doctors);
     }
@@ -145,6 +206,24 @@ public class PatientController {
         List<Doctor> doctors = doctorService.getDoctorsBySpecialization(specialization);
         return ResponseEntity.ok(doctors);
     }
+
+    @GetMapping("/doctor/{doctor_id}/date/{date}")
+    public ResponseEntity<List<Slot>> getAvailableSlots(
+            @PathVariable Long doctor_id, 
+            @PathVariable String date) {
+        LocalDate appointmentDate = LocalDate.parse(date);
+        List<Slot> slots = slotService.getAvailableSlotsByDoctorAndDate(doctor_id, appointmentDate);
+        return ResponseEntity.ok(slots);
+    }
+
+    @GetMapping("/doctor-slots/{doctor_id}")
+
+    public ResponseEntity<List<Slot>> getAvailableSlotsByDoctor(
+            @PathVariable Long doctor_id) {
+        List<Slot> slots = slotService.getAvailableSlotsByDoctor(doctor_id);
+        return ResponseEntity.ok(slots);
+    }
+
 
 
 }

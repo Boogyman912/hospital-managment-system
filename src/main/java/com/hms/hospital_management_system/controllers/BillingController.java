@@ -7,7 +7,7 @@ import java.util.*;
 import com.hms.hospital_management_system.models.Billing;
 import com.hms.hospital_management_system.services.BillingService;
 @RestController
-@RequestMapping("/api/billing")
+@RequestMapping("/api/staff/billing")
 public class BillingController {
 
     @Autowired

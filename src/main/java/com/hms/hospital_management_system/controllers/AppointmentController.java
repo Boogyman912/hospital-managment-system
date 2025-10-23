@@ -107,5 +107,16 @@ public class AppointmentController {
         }
     }
     
-    
+    @PostMapping("/cancel/appointment/{appointmentId}")
+    public ResponseEntity<Map<String, Object>> cancelAppointment(@PathVariable Long appointmentId) {
+        try {
+            // can integrate a refund process
+            appointmentService.cancelAppointment(appointmentId);
+            return ResponseEntity
+                    .ok(Map.of("success", true, "message", "Appointment cancelled successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message",
+                    "Error cancelling appointment: " + e.getMessage()));
+        }
+    }
 }

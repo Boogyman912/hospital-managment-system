@@ -16,15 +16,7 @@ public class SlotController {
     @Autowired
     private SlotService slotService;
     
-    @GetMapping("/doctor/{doctor_id}/date/{date}")
-    public ResponseEntity<List<Slot>> getAvailableSlots(
-            @PathVariable Long doctor_id, 
-            @PathVariable String date) {
-        LocalDate appointmentDate = LocalDate.parse(date);
-        List<Slot> slots = slotService.getAvailableSlotsByDoctorAndDate(doctor_id, appointmentDate);
-        return ResponseEntity.ok(slots);
-    }
-
+   
     @GetMapping("/all")
     public ResponseEntity<List<Slot>> getAllSlots() {
         List<Slot> slots = slotService.getAllSlots();

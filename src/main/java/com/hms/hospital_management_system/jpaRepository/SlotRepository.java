@@ -33,4 +33,13 @@ public interface SlotRepository extends JpaRepository<Slot, Long> {
     List<Slot> findByDoctor(
         @Param("doctor_id") Long doctor_id
     );
+
+     @Query("SELECT s FROM Slot s " +
+           "WHERE s.doctor.id = :doctor_id " + // Access the Doctor's ID property
+           "AND s.status = :status " +
+           "AND s.date >= CURRENT_DATE") // Filter for dates that are today or in the future
+    List<Slot> findByDoctorAndStatus(
+        @Param("doctor_id") Long doctor_id,
+        @Param("status") Slot.SlotStatus status
+    );
 }

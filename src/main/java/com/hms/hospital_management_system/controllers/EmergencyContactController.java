@@ -7,7 +7,7 @@ import java.util.*;
 import com.hms.hospital_management_system.models.EmergencyContact;
 
 @RestController
-@RequestMapping("/api/emergency-contacts")
+@RequestMapping("/api/staff/emergency-contacts")
 public class EmergencyContactController {
     @Autowired
     private EmergencyContactService emergencyContactService;

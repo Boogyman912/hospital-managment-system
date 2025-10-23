@@ -25,7 +25,7 @@ public class LabTestController {
         return ResponseEntity.ok(labTestService.getAllLabTests());
     }
 
-    @GetMapping("/tesName/{testName}/testType/{testType}")
+    @GetMapping("/testName/{testName}/testType/{testType}")
     public ResponseEntity<?> getLabTestByNameAndType(@PathVariable String testName, @PathVariable String testType) {
         try {
             LabTest labTest = labTestService.getLabTestByNameAndType(testName, testType);

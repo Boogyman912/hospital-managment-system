@@ -11,6 +11,7 @@ import com.hms.hospital_management_system.jpaRepository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -92,7 +93,7 @@ public class AdminController {
         }
     }
 
-
+    // can also add non - technical staff 
     @Transactional
     @PostMapping("/register-staff")
     public ResponseEntity<?> registerStaff(@RequestBody RegisterStaffRequest req) {
@@ -174,6 +175,8 @@ public class AdminController {
     @DeleteMapping("/staff/delete/{id}")
     public ResponseEntity<Void> deleteStaff(@PathVariable Long id) {
         try {
+            User user = userRepository.findByStaffId(id).orElseThrow(()-> new UsernameNotFoundException("User doesn't exist"));
+            userRepository.deleteById(user.getId());
             staffService.deleteStaff(id);
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
@@ -249,7 +252,7 @@ public class AdminController {
     }
 
     // Apppointment Management
-    @GetMapping("/all/appointments/")
+    @GetMapping("/all/appointments")
     public ResponseEntity<List<Appointment>> getAllAppointments() {
         List<Appointment> appointments = appointmentService.getAllAppointments();
         return ResponseEntity.ok(appointments);

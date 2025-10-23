@@ -4,6 +4,7 @@ import com.hms.hospital_management_system.models.*;
 import java.time.LocalDate;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -156,8 +157,9 @@ public class AppointmentService {
         return (doctorId == doctor_id);
     }
 
-    public List<Appointment> findByPhoneNumber(String phoneNumber){
-        List<Appointment> appointment = appointmentRepository.findByPhoneNumber(phoneNumber);
+    public List<Appointment> findByPhoneNumber(String phoneNumber) throws RuntimeException{
+        Long patientId = patientService.findByPhoneNumber(phoneNumber).orElseThrow(()-> new UsernameNotFoundException("No patient exist with this phone number "+phoneNumber)).getPatientId();
+        List<Appointment> appointment = appointmentRepository.findByPatientPatientId(patientId);
         return appointment;
     }
 }

@@ -1,7 +1,7 @@
 package com.hms.hospital_management_system.models;
 import jakarta.persistence.*;
 import java.time.LocalDate;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+// import com.fasterxml.jackson.annotation.JsonIgnore;
 @Entity
 @Table(name = "appointments")
 public class Appointment {
