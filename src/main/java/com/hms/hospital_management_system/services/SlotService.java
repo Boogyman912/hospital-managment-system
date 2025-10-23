@@ -7,8 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.ArrayList;
+import java.util.*;
 import org.springframework.dao.DataIntegrityViolationException;
+
 @Service
 public class SlotService {
     
@@ -46,15 +48,29 @@ public class SlotService {
         }
     }
 
-    public List<Slot> getAvailableSlotsByDoctor(Long doctor_id){
-        try {
-            // CHANGED: repository method renamed to use explicit JPQL method name findByDoctorAndDateAndStatus
-            return slotRepository.findByDoctorAndStatus(doctor_id,Slot.SlotStatus.AVAILABLE);
-        } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
-            return null;
+    public List<Slot> getAvailableSlotsByDoctor(Long doctorId) {
+    try {
+        // Fetch all available slots for the given doctor
+        List<Slot> availableSlots = slotRepository.findByDoctorAndStatus(doctorId, Slot.SlotStatus.AVAILABLE);
+
+        // Filter slots that are for today or future dates
+        List<Slot> availableSlotsForTodayAndAfter = new ArrayList<>();
+        LocalDate today = LocalDate.now();
+
+        for (Slot slot : availableSlots) {
+            if (!slot.getDate().isBefore(today)) { // same as slot.getDate() >= today
+                availableSlotsForTodayAndAfter.add(slot);
+            }
         }
+
+        return availableSlotsForTodayAndAfter;
+
+    } catch (Exception e) {
+        System.err.println("Error fetching available slots: " + e.getMessage());
+        return Collections.emptyList(); // better than returning null
     }
+}
+
     
     public Slot holdSlot(Long slotId, int holdMinutes) {
         try {
