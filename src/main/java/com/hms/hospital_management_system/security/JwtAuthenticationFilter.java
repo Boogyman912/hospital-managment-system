@@ -1,6 +1,7 @@
 package com.hms.hospital_management_system.security;
 
 import com.hms.hospital_management_system.utils.JwtUtil;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,14 +34,36 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         final String authHeader = request.getHeader("Authorization");
 
+        // ✅ Skip JWT validation for authentication and public endpoints
+        String requestPath = request.getRequestURI();
+        if (requestPath.startsWith("/api/auth")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String username = null;
         String token = null;
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             token = authHeader.substring(7);
-            username = jwtUtil.extractUsername(token);
+
+            try {
+                username = jwtUtil.extractUsername(token);
+            } catch (ExpiredJwtException e) {
+                System.out.println("⚠️ Token expired: " + e.getMessage());
+                // Optionally set HTTP 401 if you want frontend to refresh token
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("{\"error\":\"Token expired, please login again\"}");
+                return;
+            } catch (Exception e) {
+                System.out.println("⚠️ Invalid token: " + e.getMessage());
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("{\"error\":\"Invalid token\"}");
+                return;
+            }
         }
 
+        // ✅ Proceed only if token is valid and not already authenticated
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
