@@ -25,6 +25,51 @@ export default function DoctorAppointments() {
   const [prescSubmitting, setPrescSubmitting] = useState(false);
   const [prescError, setPrescError] = useState("");
   const [prescSuccess, setPrescSuccess] = useState("");
+
+  const handlePrescriptionSubmit = async () => {
+    setPrescError("");
+    setPrescSuccess("");
+    if (!prescFor.appointmentId) {
+      setPrescError("Missing appointment details.");
+      return;
+    }
+    setPrescSubmitting(true);
+    try {
+      const payload = {
+        medications: medications
+          .map((m) => ({
+            itemName: (m.itemName || "").trim(),
+            brandName: (m.brandName || "").trim(),
+            quantity: (m.quantity || "").trim(),
+            medication_instructions: (m.medication_instructions || "").trim(),
+          }))
+          .filter(
+            (m) =>
+              m.itemName ||
+              m.brandName ||
+              m.quantity ||
+              m.medication_instructions
+          ),
+        labTests: labTests
+          .map((t) => ({
+            testName: (t.testName || "").trim(),
+            testType: (t.testType || "").trim(),
+          }))
+          .filter((t) => t.testName || t.testType),
+        instructions: (instructions || "").trim(),
+      };
+      await apiPost(
+        `/api/doctor/prescription/${prescFor.appointmentId}`,
+        payload
+      );
+      setPrescSuccess("Prescription added successfully.");
+      setTimeout(() => setPrescOpen(false), 800);
+    } catch (e) {
+      setPrescError(e?.message || "Failed to submit prescription");
+    } finally {
+      setPrescSubmitting(false);
+    }
+  };
   const columns = [
     {
       key: "slot",
@@ -203,46 +248,7 @@ export default function DoctorAppointments() {
               Cancel
             </button>
             <button
-              onClick={async () => {
-                setPrescError("");
-                setPrescSuccess("");
-                setPrescSubmitting(true);
-                try {
-                  const payload = {
-                    appointmentId: prescFor.appointmentId,
-                    patientId: prescFor.patientId,
-                    doctorId: prescFor.doctorId,
-                    medications: medications
-                      .map((m) => ({
-                        itemName: (m.itemName || "").trim(),
-                        brandName: (m.brandName || "").trim(),
-                        quantity: (m.quantity || "").trim(),
-                        medication_instructions: (
-                          m.medication_instructions || ""
-                        ).trim(),
-                      }))
-                      .filter((m) => m.itemName),
-                    labTests: labTests
-                      .map((t) => ({
-                        testName: (t.testName || "").trim(),
-                        testType: (t.testType || "").trim(),
-                      }))
-                      .filter((t) => t.testName),
-                    instructions: instructions || "",
-                  };
-                  await apiPost(
-                    `/api/doctor/prescription/${prescFor.appointmentId}`,
-                    payload
-                  );
-                  setPrescSuccess("Prescription added successfully.");
-                  // Close after brief delay
-                  setTimeout(() => setPrescOpen(false), 800);
-                } catch (e) {
-                  setPrescError(e?.message || "Failed to add prescription.");
-                } finally {
-                  setPrescSubmitting(false);
-                }
-              }}
+              onClick={handlePrescriptionSubmit}
               className="px-3 py-2 bg-blue-700 rounded disabled:opacity-50"
               disabled={prescSubmitting}
             >
@@ -264,7 +270,10 @@ export default function DoctorAppointments() {
             <div className="font-semibold mb-2">Medications</div>
             <div className="space-y-3">
               {medications.map((m, idx) => (
-                <div key={idx} className="grid md:grid-cols-4 gap-2">
+                <div
+                  key={idx}
+                  className="grid md:grid-cols-5 gap-2 items-start"
+                >
                   <input
                     placeholder="Item Name"
                     className="bg-gray-900 border border-gray-700 rounded px-3 py-2"
@@ -308,6 +317,21 @@ export default function DoctorAppointments() {
                       setMedications(copy);
                     }}
                   />
+                  <div className="flex">
+                    {medications.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setMedications((arr) =>
+                            arr.filter((_, i) => i !== idx)
+                          )
+                        }
+                        className="px-2 py-2 bg-gray-700 rounded"
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
@@ -344,7 +368,10 @@ export default function DoctorAppointments() {
             <div className="font-semibold mb-2">Lab Tests</div>
             <div className="space-y-3">
               {labTests.map((t, idx) => (
-                <div key={idx} className="grid md:grid-cols-2 gap-2">
+                <div
+                  key={idx}
+                  className="grid md:grid-cols-3 gap-2 items-start"
+                >
                   <input
                     placeholder="Test Name"
                     className="bg-gray-900 border border-gray-700 rounded px-3 py-2"
@@ -365,6 +392,19 @@ export default function DoctorAppointments() {
                       setLabTests(copy);
                     }}
                   />
+                  <div className="flex">
+                    {labTests.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setLabTests((arr) => arr.filter((_, i) => i !== idx))
+                        }
+                        className="px-2 py-2 bg-gray-700 rounded"
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
