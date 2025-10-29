@@ -20,6 +20,10 @@ export function AuthProvider({ children }) {
       try {
         const parsed = JSON.parse(raw);
         setUser(parsed);
+        // Set the auth token when loading from localStorage
+        if (parsed.token) {
+          setAuthToken(parsed.token);
+        }
       } catch {
         localStorage.removeItem(AUTH_STORAGE_KEY);
       }

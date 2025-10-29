@@ -15,11 +15,18 @@ export default function DoctorAppointments() {
   const load = async () => {
     setLoading(true);
     setError("");
+    const prev = data;
     try {
       const res = await apiGet("/api/doctor/appointments");
-      setData(res || []);
+      const list = Array.isArray(res)
+        ? res
+        : Array.isArray(res?.data)
+        ? res.data
+        : [];
+      setData(list);
     } catch (e) {
-      setError(e?.message || "Failed to load appointments");
+      setData(prev);
+      setError("Failed to load appointments. Please try again later.");
     } finally {
       setLoading(false);
     }

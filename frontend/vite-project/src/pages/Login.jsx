@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Roles, useAuth } from "../auth/AuthContext.jsx";
+import Header from "../components/Header.jsx";
 
 export default function Login() {
   const { login } = useAuth();
@@ -30,35 +31,38 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-100 flex items-center justify-center p-4">
-      <form
-        onSubmit={onSubmit}
-        className="w-full max-w-md bg-gray-800 border border-gray-700 rounded-lg p-6"
-      >
-        <h1 className="text-2xl font-semibold mb-4">Login</h1>
-        <label className="block mb-2 text-sm text-gray-300">Username</label>
-        <input
-          className="w-full mb-4 px-3 py-2 bg-gray-900 border border-gray-700 rounded"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          placeholder="Enter name"
-        />
-        <label className="block mb-2 text-sm text-gray-300">Password</label>
-        <input
-          type="password"
-          className="w-full mb-4 px-3 py-2 bg-gray-900 border border-gray-700 rounded"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Enter password"
-        />
-        {error && <div className="mb-3 text-red-400 text-sm">{error}</div>}
-        <button
-          disabled={loading}
-          className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-60 px-4 py-2 rounded font-medium"
+    <div className="min-h-screen bg-gray-900 flex flex-col">
+      <Header />
+      <div className="flex-1 flex items-center justify-center p-4">
+        <form
+          onSubmit={onSubmit}
+          className="w-full max-w-md bg-gray-800 border border-gray-700 rounded-lg p-6"
         >
-          {loading ? "Logging in..." : "Login"}
-        </button>
-      </form>
+          <h1 className="text-2xl font-semibold mb-4">Login</h1>
+          <label className="block mb-2 text-sm text-gray-300">Username</label>
+          <input
+            className="w-full mb-4 px-3 py-2 bg-gray-900 border border-gray-700 rounded"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            placeholder="Enter name"
+          />
+          <label className="block mb-2 text-sm text-gray-300">Password</label>
+          <input
+            type="password"
+            className="w-full mb-4 px-3 py-2 bg-gray-900 border border-gray-700 rounded"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Enter password"
+          />
+          {error && <div className="mb-3 text-red-400 text-sm">{error}</div>}
+          <button
+            disabled={loading}
+            className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-60 px-4 py-2 rounded font-medium"
+          >
+            {loading ? "Logging in..." : "Login"}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

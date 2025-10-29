@@ -21,7 +21,7 @@ export default function StaffManagement() {
     setLoading(true);
     setError("");
     try {
-      const data = await apiGet("/staff/all");
+      const data = await apiGet("/api/admin/staff/all");
       setStaff(data || []);
     } catch (e) {
       setError(e?.message || "Failed to load staff");
