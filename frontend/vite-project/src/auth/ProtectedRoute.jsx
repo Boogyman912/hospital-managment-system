@@ -5,7 +5,8 @@ import { Roles, useAuth } from "./AuthContext.jsx";
 export default function ProtectedRoute({
   allow = [Roles.ADMIN, Roles.DOCTOR, Roles.STAFF],
 }) {
-  const { user } = useAuth();
+  const { user, isReady } = useAuth();
+  if (!isReady) return null; // wait until auth rehydration
   if (!user) return <Navigate to="/login" replace />;
   if (!allow.includes(user.role)) return <Navigate to="/dashboard" replace />;
   return <Outlet />;

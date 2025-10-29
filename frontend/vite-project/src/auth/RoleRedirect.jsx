@@ -3,7 +3,8 @@ import { Navigate } from "react-router-dom";
 import { Roles, useAuth } from "./AuthContext.jsx";
 
 export default function RoleRedirect() {
-  const { user } = useAuth();
+  const { user, isReady } = useAuth();
+  if (!isReady) return null;
   if (!user) return <Navigate to="/login" replace />;
   if (user.role === Roles.ADMIN)
     return <Navigate to="/admin/dashboard" replace />;

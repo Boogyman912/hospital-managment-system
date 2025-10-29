@@ -8,9 +8,17 @@ export default function DoctorAppointments() {
   const [error, setError] = useState("");
   const [data, setData] = useState([]);
   const columns = [
-    { key: "time", header: "Time" },
-    { key: "patient", header: "Patient" },
-    { key: "status", header: "Status" },
+    {
+      key: "slot",
+      header: "Time",
+      render: (slot) => (slot?.time ? slot.time : "N/A"),
+    },
+    {
+      key: "patient",
+      header: "Patient",
+      render: (patient) => (patient?.name ? patient.name : "N/A"),
+    },
+    { key: "appointmentStatus", header: "Status" },
   ];
   const load = async () => {
     setLoading(true);
