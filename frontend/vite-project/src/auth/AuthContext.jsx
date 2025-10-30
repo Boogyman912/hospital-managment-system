@@ -13,6 +13,7 @@ const AUTH_STORAGE_KEY = "hms_auth";
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
+  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
     const raw = localStorage.getItem(AUTH_STORAGE_KEY);
@@ -20,10 +21,14 @@ export function AuthProvider({ children }) {
       try {
         const parsed = JSON.parse(raw);
         setUser(parsed);
+        if (parsed.token) {
+          setAuthToken(parsed.token);
+        }
       } catch {
         localStorage.removeItem(AUTH_STORAGE_KEY);
       }
     }
+    setIsReady(true);
   }, []);
 
   const login = async (username, password) => {
@@ -45,7 +50,10 @@ export function AuthProvider({ children }) {
     setUser(null);
   };
 
-  const value = useMemo(() => ({ user, login, logout }), [user]);
+  const value = useMemo(
+    () => ({ user, isReady, login, logout }),
+    [user, isReady]
+  );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

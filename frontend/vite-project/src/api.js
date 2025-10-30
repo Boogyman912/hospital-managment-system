@@ -22,10 +22,14 @@ function buildHeaders(extra = {}) {
 async function handle(res) {
   const text = await res.text(); // read once
   if (!res.ok) throw new Error(text || "Request failed");
+
   try {
-    return text ? JSON.parse(text) : {};
-  } catch {
-    return {};
+    const parsed = text ? JSON.parse(text) : {};
+    return parsed;
+  } catch (err) {
+    console.error("[handle] Failed to parse JSON:", err, "Raw text:", text);
+    // If backend accidentally returns HTML or something unexpected, log it
+    return [];
   }
 }
 

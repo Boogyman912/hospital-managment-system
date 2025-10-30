@@ -24,65 +24,74 @@ import Slots from "./pages/doctor/Slots.jsx";
 import DoctorFeedbacks from "./pages/doctor/Feedbacks.jsx";
 import StaffDashboard from "./pages/staff/StaffDashboard.jsx";
 import Rooms from "./pages/staff/Rooms.jsx";
+import PaymentPage from "./pages/PaymentPage.jsx";
+import PatientAppointments from "./pages/PatientAppointments.jsx";
 import { Roles } from "./auth/AuthContext.jsx";
 
-const router = createBrowserRouter([
-  { path: "/", element: <App /> },
-  { path: "/doctors", element: <DoctorsListPage /> },
-  { path: "/login", element: <Login /> },
-  { path: "/register-doctor", element: <RegisterDoctor /> },
-  { path: "/dashboard", element: <RoleRedirect /> },
-  {
-    element: <ProtectedRoute allow={[Roles.ADMIN]} />,
-    children: [
-      {
-        path: "/admin",
-        element: <AdminLayout />,
-        children: [
-          { path: "/admin/dashboard", element: <AdminDashboard /> },
-          { path: "/admin/doctors", element: <DoctorsManagement /> },
-          { path: "/admin/staff", element: <StaffManagement /> },
-          { path: "/admin/appointments", element: <AdminAppointments /> },
-          { path: "/admin/feedbacks", element: <AdminFeedbacks /> },
-        ],
-      },
-    ],
-  },
-  {
-    element: <ProtectedRoute allow={[Roles.DOCTOR]} />,
-    children: [
-      {
-        path: "/doctor",
-        element: <DoctorLayout />,
-        children: [
-          { path: "/doctor/dashboard", element: <DoctorDashboard /> },
-          { path: "/doctor/appointments", element: <DoctorAppointments /> },
-          { path: "/doctor/prescriptions", element: <Prescriptions /> },
-          { path: "/doctor/slots", element: <Slots /> },
-          { path: "/doctor/feedbacks", element: <DoctorFeedbacks /> },
-        ],
-      },
-    ],
-  },
-  {
-    element: <ProtectedRoute allow={[Roles.STAFF]} />,
-    children: [
-      {
-        path: "/staff",
-        element: <StaffLayout />,
-        children: [
-          { path: "/staff/dashboard", element: <StaffDashboard /> },
-          { path: "/staff/rooms", element: <Rooms /> },
-        ],
-      },
-    ],
-  },
-]);
+// Create a component that wraps the router with AuthProvider
+function AppWithAuth() {
+  const router = createBrowserRouter([
+    { path: "/", element: <App /> },
+    { path: "/doctors", element: <DoctorsListPage /> },
+    { path: "/login", element: <Login /> },
+    { path: "/register-doctor", element: <RegisterDoctor /> },
+    { path: "/payment", element: <PaymentPage /> },
+    { path: "/appointments", element: <PatientAppointments /> },
+    { path: "/dashboard", element: <RoleRedirect /> },
+    {
+      element: <ProtectedRoute allow={[Roles.ADMIN]} />,
+      children: [
+        {
+          path: "/admin",
+          element: <AdminLayout />,
+          children: [
+            { path: "/admin/dashboard", element: <AdminDashboard /> },
+            { path: "/admin/doctors", element: <DoctorsManagement /> },
+            { path: "/admin/staff", element: <StaffManagement /> },
+            { path: "/admin/appointments", element: <AdminAppointments /> },
+            { path: "/admin/feedbacks", element: <AdminFeedbacks /> },
+          ],
+        },
+      ],
+    },
+    {
+      element: <ProtectedRoute allow={[Roles.DOCTOR]} />,
+      children: [
+        {
+          path: "/doctor",
+          element: <DoctorLayout />,
+          children: [
+            { path: "/doctor/dashboard", element: <DoctorDashboard /> },
+            { path: "/doctor/appointments", element: <DoctorAppointments /> },
+            { path: "/doctor/prescriptions", element: <Prescriptions /> },
+            { path: "/doctor/slots", element: <Slots /> },
+            { path: "/doctor/feedbacks", element: <DoctorFeedbacks /> },
+          ],
+        },
+      ],
+    },
+    {
+      element: <ProtectedRoute allow={[Roles.STAFF]} />,
+      children: [
+        {
+          path: "/staff",
+          element: <StaffLayout />,
+          children: [
+            { path: "/staff/dashboard", element: <StaffDashboard /> },
+            { path: "/staff/rooms", element: <Rooms /> },
+          ],
+        },
+      ],
+    },
+  ]);
+
+  return <RouterProvider router={router} />;
+}
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <AuthProvider>
-      <RouterProvider router={router} />
+      <AppWithAuth />
     </AuthProvider>
   </StrictMode>
 );

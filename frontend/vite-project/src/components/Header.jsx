@@ -19,10 +19,10 @@ export default function Header() {
             Doctors
           </Link>
           <Link
-            to="/register-doctor"
+            to="/appointments"
             className="hover:text-blue-400 transition-colors"
           >
-            Register Doctor
+            My Appointments
           </Link>
           <Link
             to="/login"

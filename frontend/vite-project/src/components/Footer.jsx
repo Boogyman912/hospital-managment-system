@@ -9,8 +9,8 @@ export default function Footer() {
             Features
           </a>
           <span className="text-gray-600">|</span>
-          <a href="#download" className="px-3 hover:text-white">
-            Download
+          <a href="#features" className="px-3 hover:text-white">
+           Feedback 
           </a>
         </div>
         <div className="text-center text-sm">
