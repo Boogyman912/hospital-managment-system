@@ -2,8 +2,10 @@ package com.hms.hospital_management_system.services;
 import com.hms.hospital_management_system.jpaRepository.AppointmentRepository;
 import com.hms.hospital_management_system.models.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -34,15 +36,50 @@ public class AppointmentService {
         }
     }
     
-    public List<Appointment> getAppointmentsByDoctorId(Long doctor_id) {
-        try {
-            // CHANGED: repository method renamed to use explicit JPQL alias findByDoctorId
-            return appointmentRepository.findByDoctorId(doctor_id);
-        } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
-            return null;
+public List<Appointment> getAppointmentsByDoctorId(Long doctorId) {
+    List<Appointment> filteredAppointments = new ArrayList<>();
+
+    try {
+        // Validate input
+        if (doctorId == null) {
+            throw new IllegalArgumentException("Doctor ID cannot be null.");
         }
+
+        // Fetch appointments for the doctor
+        List<Appointment> appointments = appointmentRepository.findByDoctorId(doctorId);
+
+        if (appointments == null || appointments.isEmpty()) {
+            System.out.println("No appointments found for doctor ID: " + doctorId);
+            return filteredAppointments;
+        }
+
+        LocalDate today = LocalDate.now();
+
+        // Filter appointments of today and after today
+        filteredAppointments = appointments.stream()
+                .filter(appointment -> {
+                    try {
+                        LocalDate date = appointment.getSlot() != null ? appointment.getSlot().getDate() : null;
+                        return date != null && (date.isEqual(today) || date.isAfter(today));
+                    } catch (Exception ex) {
+                        System.err.println("Error processing appointment ID " + appointment.getAppointmentId() + ": " + ex.getMessage());
+                        return false;
+                    }
+                })
+                .toList();
+
+    } catch (IllegalArgumentException ex) {
+        System.err.println("Invalid argument: " + ex.getMessage());
+    } catch (DataAccessException ex) {
+        System.err.println("Database access error while fetching appointments: " + ex.getMessage());
+    } catch (Exception ex) {
+        System.err.println("Unexpected error while fetching appointments for doctor ID " + doctorId + ": " + ex.getMessage());
     }
+
+    return filteredAppointments;
+}
+
+
     
     public List<Appointment> getAppointmentsByPatientId(Long patientId) {
         try {

@@ -93,7 +93,21 @@ public class AdminController {
         }
     }
 
-    // can also add non - technical staff 
+    @Transactional
+    @DeleteMapping("/delete-doctor/{doctorId}")
+    public ResponseEntity<?> deleteDoctor(@PathVariable Long doctorId) {
+        try {
+            doctorService.deleteDoctor(doctorId);
+            return ResponseEntity.ok("Doctor with ID " + doctorId + " deleted successfully.");
+        } catch (UsernameNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error deleting doctor with ID " + doctorId + ": " + e.getMessage());
+        }
+    }
+
+    // can also add non - technical staff
     @Transactional
     @PostMapping("/register-staff")
     public ResponseEntity<?> registerStaff(@RequestBody RegisterStaffRequest req) {
@@ -132,10 +146,8 @@ public class AdminController {
                     "Error saving user: " + e.getMessage(), e);
         }
 
-        return ResponseEntity.ok(Map.of(
-            "message" ,"Staff registered successfully",
-            "staff" , staff
-        ));
+        return ResponseEntity
+                .ok(Map.of("message", "Staff registered successfully", "staff", staff));
     }
 
 
@@ -175,7 +187,8 @@ public class AdminController {
     @DeleteMapping("/staff/delete/{id}")
     public ResponseEntity<Void> deleteStaff(@PathVariable Long id) {
         try {
-            User user = userRepository.findByStaffId(id).orElseThrow(()-> new UsernameNotFoundException("User doesn't exist"));
+            User user = userRepository.findByStaffId(id)
+                    .orElseThrow(() -> new UsernameNotFoundException("User doesn't exist"));
             userRepository.deleteById(user.getId());
             staffService.deleteStaff(id);
             return ResponseEntity.noContent().build();

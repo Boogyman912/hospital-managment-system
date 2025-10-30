@@ -1,8 +1,12 @@
 package com.hms.hospital_management_system.services;
 import com.hms.hospital_management_system.jpaRepository.DoctorRepository;
+import com.hms.hospital_management_system.jpaRepository.UserRepository;
 import com.hms.hospital_management_system.models.Doctor;
+import com.hms.hospital_management_system.models.User;
+import jakarta.transaction.Transactional;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -10,6 +14,9 @@ public class DoctorService {
     
     @Autowired
     private DoctorRepository doctorRepository;
+
+    @Autowired
+    private UserRepository userRepository;
     public List<Doctor> getAllDoctors() {
         // logic to get all doctors
         try {
@@ -65,5 +72,26 @@ public class DoctorService {
             return null;
         }
     }
+    @Transactional
+    public void deleteDoctor(Long doctorId) {
+    try {
+        // Fetch the user associated with the doctor
+        User user = userRepository.findByDoctorId(doctorId).orElseThrow(()-> new UsernameNotFoundException("User doesn't Exist"));
+        if (user == null) {
+            throw new UsernameNotFoundException("No user found for doctor ID: " + doctorId);
+        }
+
+        // Delete the user record first (if required by DB constraints)
+        userRepository.deleteById(user.getId());
+
+        // Delete the doctor record
+        doctorRepository.deleteById(doctorId);
+
+    } catch (UsernameNotFoundException e) {
+        throw e; // rethrow specific error to handle in controller
+    } catch (Exception e) {
+        throw new RuntimeException("Error deleting doctor with ID: " + doctorId + " — " + e.getMessage(), e);
+    }
+}
 
 }

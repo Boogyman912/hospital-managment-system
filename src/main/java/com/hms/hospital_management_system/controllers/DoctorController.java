@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.hms.hospital_management_system.models.Appointment;
+import com.hms.hospital_management_system.models.Doctor;
 import com.hms.hospital_management_system.models.Slot;
 // import com.hms.hospital_management_system.models.Doctor;
 import com.hms.hospital_management_system.models.Prescription;
@@ -23,10 +24,12 @@ import com.hms.hospital_management_system.services.AppointmentService;
 import com.hms.hospital_management_system.services.FeedbackService;
 import com.hms.hospital_management_system.services.PrescriptionService;
 import com.hms.hospital_management_system.services.SlotService;
+import jakarta.transaction.Transactional;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import com.hms.hospital_management_system.dto.FeedbackDTO;
 import com.hms.hospital_management_system.jpaRepository.UserRepository;
+import com.hms.hospital_management_system.services.DoctorService;
 
 @RestController
 @RequestMapping("/api/doctor")
@@ -47,6 +50,9 @@ public class DoctorController {
 
         @Autowired
         private FeedbackService feedbackService;
+
+        @Autowired
+        private DoctorService doctorService;
 
         // Doctor can only see their appointments
         @GetMapping("/appointments")
@@ -75,6 +81,7 @@ public class DoctorController {
         }
 
         // Doctor can only create prescription for patients who had an appointment with them
+        @Transactional
         @PostMapping("/prescriptions/{appointment_id}")
         public ResponseEntity<String> createPrescription(@RequestBody Prescription prescription,
                         Authentication auth, @PathVariable Long appointment_id)
@@ -89,7 +96,11 @@ public class DoctorController {
                         return ResponseEntity.status(403).body(
                                         "Forbidden: Patient did not book appointment with you");
                 }
-
+                Appointment appointment = appointmentService.getAppointmentById(appointment_id);
+                appointment.setAppointmentStatus(Appointment.AppointmentStatus.COMPLETED);
+                prescription.setDoctor(doctorService.getDoctorById(doctorId));
+                prescription.setPatient(appointment.getPatient());
+                prescription.setDateIssued(LocalDate.now());
                 prescriptionService.createPrescription(prescription);
                 return ResponseEntity.ok("Prescription created successfully");
         }
