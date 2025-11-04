@@ -1,5 +1,4 @@
-import React, { memo } from "react";
-import { useState, useCallback } from "react";
+import { memo, useState, useCallback, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Header from "./components/Header.jsx";
 import Footer from "./components/Footer.jsx";
@@ -73,13 +72,12 @@ export default function DoctorsListPage() {
     emergency_contact_id: "",
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
     let cancelled = false;
     async function load() {
       try {
         setLoadingDoctors(true);
         const data = await apiGet("/api/home/doctors");
-        console.log("[load doctors] raw response:", data);
         if (cancelled) return;
         const list = Array.isArray(data)
           ? data
@@ -89,14 +87,11 @@ export default function DoctorsListPage() {
           ? data.data
           : [];
         if (list.length === 0) {
-          console.warn("[load doctors] No doctors received");
           setDoctors([]);
         } else {
-          console.log(`[load doctors] Loaded ${list.length} doctors`);
           setDoctors(list);
         }
-      } catch (e) {
-        console.error("[load doctors] error:", e);
+      } catch {
         if (!cancelled) {
           // rollback: keep whatever was already in state
           setError("Failed to load doctors. Please try again later.");

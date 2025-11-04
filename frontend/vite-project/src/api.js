@@ -1,4 +1,4 @@
-export const BASE_URL = "https://bjt6d7s9-8080.inc1.devtunnels.ms";
+export const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 
 const TOKEN_KEY = "hms_token";
 
@@ -26,9 +26,8 @@ async function handle(res) {
   try {
     const parsed = text ? JSON.parse(text) : {};
     return parsed;
-  } catch (err) {
-    console.error("[handle] Failed to parse JSON:", err, "Raw text:", text);
-    // If backend accidentally returns HTML or something unexpected, log it
+  } catch {
+    // If backend accidentally returns HTML or something unexpected, return empty array
     return [];
   }
 }
@@ -42,10 +41,11 @@ export async function apiGet(path) {
 }
 
 export async function apiPost(path, data) {
+  const isFormData = data instanceof FormData;
   const res = await fetch(`${BASE_URL}${path}`, {
     method: "POST",
-    headers: buildHeaders(),
-    body: data instanceof FormData ? data : JSON.stringify(data ?? {}),
+    headers: isFormData ? buildHeaders({ "Content-Type": undefined }) : buildHeaders(),
+    body: isFormData ? data : JSON.stringify(data ?? {}),
   });
   return handle(res);
 }

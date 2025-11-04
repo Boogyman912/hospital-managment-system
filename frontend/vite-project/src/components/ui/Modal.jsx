@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import { memo } from "react";
 
 const Modal = memo(function Modal({ title, open, onClose, children, footer }) {
   if (!open) return null;

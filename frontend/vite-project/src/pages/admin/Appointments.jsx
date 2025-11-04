@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Card from "../../components/ui/Card.jsx";
 import Table from "../../components/ui/Table.jsx";
 import { apiGet, apiPost } from "../../api.js";

@@ -4,7 +4,6 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./index.css";
 import App from "./App.jsx";
 import DoctorsListPage from "./DoctorsListPage.jsx";
-import RegisterDoctor from "./RegisterDoctor.jsx";
 import Login from "./pages/Login.jsx";
 import { AuthProvider } from "./auth/AuthContext.jsx";
 import { Roles } from "./auth/roles.js";
@@ -29,12 +28,12 @@ import PaymentPage from "./pages/PaymentPage.jsx";
 import PatientAppointments from "./pages/PatientAppointments.jsx";
 
 // Create a component that wraps the router with AuthProvider
+// eslint-disable-next-line react-refresh/only-export-components
 function AppWithAuth() {
   const router = createBrowserRouter([
     { path: "/", element: <App /> },
     { path: "/doctors", element: <DoctorsListPage /> },
     { path: "/login", element: <Login /> },
-    { path: "/register-doctor", element: <RegisterDoctor /> },
     { path: "/payment", element: <PaymentPage /> },
     { path: "/appointments", element: <PatientAppointments /> },
     { path: "/dashboard", element: <RoleRedirect /> },
