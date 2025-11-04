@@ -24,6 +24,8 @@ export default defineConfig([
     },
     rules: {
       'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+      // Relax react-refresh warnings for utility exports and entry files
+      'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
     },
   },
 ])

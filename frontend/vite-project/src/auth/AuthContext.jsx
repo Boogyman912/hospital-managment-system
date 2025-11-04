@@ -1,5 +1,6 @@
 import React, {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -31,7 +32,7 @@ export function AuthProvider({ children }) {
     setIsReady(true);
   }, []);
 
-  const login = async (username, password) => {
+  const login = useCallback(async (username, password) => {
     const res = await apiPost("/api/auth/login", { username, password });
     if (res?.token) setAuthToken(res.token);
     const authUser = {
@@ -42,17 +43,17 @@ export function AuthProvider({ children }) {
     localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(authUser));
     setUser(authUser);
     return authUser;
-  };
+  }, []);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     localStorage.removeItem(AUTH_STORAGE_KEY);
     setAuthToken(null);
     setUser(null);
-  };
+  }, []);
 
   const value = useMemo(
     () => ({ user, isReady, login, logout }),
-    [user, isReady]
+    [user, isReady, login, logout]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
@@ -63,9 +64,3 @@ export function useAuth() {
   if (!ctx) throw new Error("useAuth must be used within AuthProvider");
   return ctx;
 }
-
-export const Roles = {
-  ADMIN: "ADMIN",
-  DOCTOR: "DOCTOR",
-  STAFF: "STAFF",
-};

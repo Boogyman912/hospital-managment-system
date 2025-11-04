@@ -14,50 +14,47 @@ export default function AdminDashboard() {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    const loadStats = async () => {
+      try {
+        setLoading(true);
+        setError("");
+        const [doctorsRes, staffRes, appointmentsRes] = await Promise.all([
+          apiGet("/api/home/doctors"),
+          apiGet("/api/admin/staff/all"),
+          apiGet("/api/admin/all/appointments"),
+        ]);
+
+        const today = new Date().toISOString().split("T")[0];
+        const appointments = Array.isArray(appointmentsRes)
+          ? appointmentsRes
+          : Array.isArray(appointmentsRes?.data)
+          ? appointmentsRes.data
+          : [];
+        const todayAppointments = appointments.filter(
+          (apt) => apt.bookingTime === today
+        );
+
+        const doctorsCount = Array.isArray(doctorsRes)
+          ? doctorsRes.length
+          : doctorsRes?.data?.length || 0;
+        const staffCount = Array.isArray(staffRes)
+          ? staffRes.length
+          : staffRes?.data?.length || 0;
+
+        setStats([
+          { label: "Total Doctors", value: doctorsCount },
+          { label: "Total Staff", value: staffCount },
+          { label: "Appointments Today", value: todayAppointments.length },
+        ]);
+      } catch (error) {
+        console.error("Failed to load stats:", error);
+        setError("Failed to load stats. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
     loadStats();
   }, []);
-
-  const loadStats = async () => {
-    const prev = stats;
-    try {
-      setLoading(true);
-      setError("");
-      const [doctorsRes, staffRes, appointmentsRes] = await Promise.all([
-        apiGet("/api/home/doctors"),
-        apiGet("/api/admin/staff/all"),
-        apiGet("/api/admin/all/appointments"),
-      ]);
-
-      const today = new Date().toISOString().split("T")[0];
-      const appointments = Array.isArray(appointmentsRes)
-        ? appointmentsRes
-        : Array.isArray(appointmentsRes?.data)
-        ? appointmentsRes.data
-        : [];
-      const todayAppointments = appointments.filter(
-        (apt) => apt.bookingTime === today
-      );
-
-      const doctorsCount = Array.isArray(doctorsRes)
-        ? doctorsRes.length
-        : doctorsRes?.data?.length || 0;
-      const staffCount = Array.isArray(staffRes)
-        ? staffRes.length
-        : staffRes?.data?.length || 0;
-
-      setStats([
-        { label: "Total Doctors", value: doctorsCount },
-        { label: "Total Staff", value: staffCount },
-        { label: "Appointments Today", value: todayAppointments.length },
-      ]);
-    } catch (error) {
-      console.error("Failed to load stats:", error);
-      setStats(prev);
-      setError("Failed to load stats. Please try again later.");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <div className="space-y-6">

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import Card from "../../components/ui/Card.jsx";
 import Table from "../../components/ui/Table.jsx";
 import { apiGet, apiPost } from "../../api.js";
@@ -33,10 +33,9 @@ export default function Appointments() {
     { key: "appointmentStatus", header: "Status" },
     { key: "paymentStatus", header: "Payment" },
   ];
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     setError("");
-    const prev = data;
     try {
       const res = await apiGet("/api/admin/all/appointments");
       const list = Array.isArray(res)
@@ -45,19 +44,17 @@ export default function Appointments() {
         ? res.data
         : [];
       setData(list);
-    } catch (e) {
-      // rollback to previous state and show friendly message
-      setData(prev);
+    } catch {
+      // Show friendly message on error
       setError("Failed to load appointments. Please try again later.");
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     load();
-  }, []);
-
+  }, [load]);
   return (
     <Card title="Appointments">
       {loading && <div className="text-sm text-gray-400 mb-2">Loading...</div>}

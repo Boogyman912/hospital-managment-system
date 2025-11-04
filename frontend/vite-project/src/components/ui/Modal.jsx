@@ -1,6 +1,6 @@
-import React from "react";
+import React, { memo } from "react";
 
-export default function Modal({ title, open, onClose, children, footer }) {
+const Modal = memo(function Modal({ title, open, onClose, children, footer }) {
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -20,4 +20,6 @@ export default function Modal({ title, open, onClose, children, footer }) {
       </div>
     </div>
   );
-}
+});
+
+export default Modal;
