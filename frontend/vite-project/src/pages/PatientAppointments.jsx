@@ -27,8 +27,11 @@ export default function PatientAppointments() {
       if (response.success === false) {
         setError(response.message || "No appointments found");
         setAppointments([]);
-      } else if (Array.isArray(response)) {
-        setAppointments(response);
+      } else if (
+        response.success === true &&
+        Array.isArray(response.appointments)
+      ) {
+        setAppointments(response.appointments);
         setError("");
       } else {
         setError("Invalid response format");
@@ -214,7 +217,7 @@ export default function PatientAppointments() {
                           </p>
                           <p className="text-gray-300">
                             <span className="font-medium">Contact:</span>{" "}
-                            {appointment.doctor?.contactNumber}
+                            {appointment.doctor?.phone_number}
                           </p>
                         </div>
                       </div>
@@ -225,12 +228,12 @@ export default function PatientAppointments() {
                         </h4>
                         <div className="space-y-2 text-sm">
                           <p className="text-gray-300">
-                            <span className="font-medium">Start:</span>{" "}
-                            {formatDateTime(appointment.slot?.startTime)}
+                            <span className="font-medium">Date:</span>{" "}
+                            {appointment.slot?.date || "N/A"}
                           </p>
                           <p className="text-gray-300">
-                            <span className="font-medium">End:</span>{" "}
-                            {formatDateTime(appointment.slot?.endTime)}
+                            <span className="font-medium">Time:</span>{" "}
+                            {appointment.slot?.time || "N/A"}
                           </p>
                         </div>
                       </div>

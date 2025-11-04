@@ -36,6 +36,9 @@ export default function DoctorAppointments() {
     setPrescSubmitting(true);
     try {
       const payload = {
+        appointmentId: prescFor.appointmentId,
+        patientId: prescFor.patientId,
+        doctorId: prescFor.doctorId,
         medications: medications
           .map((m) => ({
             itemName: (m.itemName || "").trim(),
@@ -59,7 +62,7 @@ export default function DoctorAppointments() {
         instructions: (instructions || "").trim(),
       };
       await apiPost(
-        `/api/doctor/prescription/${prescFor.appointmentId}`,
+        `/api/doctor/prescriptions/${prescFor.appointmentId}`,
         payload
       );
       setPrescSuccess("Prescription added successfully.");
@@ -116,7 +119,8 @@ export default function DoctorAppointments() {
         renderActions={(row) => {
           const today = new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD in local time
           const isToday = row?.slot?.date === today;
-          return (
+          const isBooked = row?.appointmentStatus === "BOOKED";
+          return isBooked ? (
             <>
               <button
                 onClick={() => {
@@ -155,6 +159,8 @@ export default function DoctorAppointments() {
                 </button>
               )}
             </>
+          ) : (
+            <div className="text-gray-400">Prescription already added.</div>
           );
         }}
       />
