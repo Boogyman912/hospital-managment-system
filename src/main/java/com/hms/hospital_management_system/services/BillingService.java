@@ -38,9 +38,12 @@ public class BillingService {
             Double amount = 0.0;
             List<Map<String, String>> meds = billing.getPrescription().getMedications();
             List<Map<String, String>> labTest = billing.getPrescription().getLabTests();
+            
             System.out.println("\n\n\n\nMedications to process: " + meds.size());
+            
+            // Process medications
             for (Map<String, String> med : meds) {
-                System.out.println("Processing medication: " + med.get("itemName") + " - " + med.get("brandName ") );
+                System.out.println("Processing medication: " + med.get("itemName") + " - " + med.get("brandName"));
                 Inventory item = inventoryService.getInventoryByItemNameAndBrandName(med.get("itemName"), med.get("brandName"));
                 if (item != null) {
                     Double unitPrice = item.getUnitPrice();
@@ -48,27 +51,35 @@ public class BillingService {
                     quantity = quantity >= item.getQuantity() ? item.getQuantity() : quantity; // Ensure we don't go negative
                     System.out.println("\n\n\n\n\n\n\n\n\n\nItem: " + item.getItemName() + ", Unit Price: " + unitPrice + ", Quantity: " + quantity);
                     amount += unitPrice * quantity;
+                }
+            }
+            
+            // Decrease inventory quantities after calculating total (reduces DB calls during calculation)
+            for (Map<String, String> med : meds) {
+                Inventory item = inventoryService.getInventoryByItemNameAndBrandName(med.get("itemName"), med.get("brandName"));
+                if (item != null) {
+                    Integer quantity = Integer.parseInt(med.get("quantity"));
+                    quantity = quantity >= item.getQuantity() ? item.getQuantity() : quantity;
                     inventoryService.decreaseQuantity(item.getItemId(), quantity);
                 }
             }
 
+            // Process lab tests
             for (Map<String, String> test : labTest) {
-            LabTest lab = labTestService.getLabTestByNameAndType(test.get("testName"), test.get("testType"));
-            if (lab != null) {
-                Double testCost = lab.getTestCost();
-                System.out.println("Lab Test: " + lab.getTestName() + ", Test Cost: " + testCost);
-                amount += testCost;
+                LabTest lab = labTestService.getLabTestByNameAndType(test.get("testName"), test.get("testType"));
+                if (lab != null) {
+                    Double testCost = lab.getTestCost();
+                    System.out.println("Lab Test: " + lab.getTestName() + ", Test Cost: " + testCost);
+                    amount += testCost;
+                }
             }
-            }
+            
             System.out.println("For prescription with prescriptionId "+ prescription_Id +" Total amount calculated: " + amount);
             billing.setPatient(prescriptionService.getPrescriptionById(prescription_Id).getPatient());
             billing.setTotalAmount(amount);
             billing.setStatus(Billing.Status.UNPAID);
             billing.setPaymentDate(null);
             billingRepository.save(billing);
-            // i also want to generate a pdf bill and send it to the patient whatsapp number
-            // how do i do it?
-            // tell me
             return billing;
         } catch (Exception e) {
             // Log the error or handle it as needed
@@ -129,22 +140,12 @@ public class BillingService {
          * Simulate payment gateway integration.
          * In a real-world scenario, you would call an external payment API here.
          * For demonstration, we'll assume payment is always successful.
+         * 
+         * If integrating with a real payment gateway, you would:
+         * 1. Prepare payment request with bill details.
+         * 2. Send request to payment provider (e.g., Stripe, Razorpay, PayPal).
+         * 3. Handle response and update bill status accordingly.
          */
-
-        // Example: Simulate payment processing delay
-        try {
-            Thread.sleep(1000); // Simulate network/payment processing delay
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            return false;
-        }
-
-        // If integrating with a real payment gateway, you would:
-        // 1. Prepare payment request with bill details.
-        // 2. Send request to payment provider (e.g., Stripe, Razorpay, PayPal).
-        // 3. Handle response and update bill status accordingly.
-
-        // For now, assume payment is successful.
         
         bill.setStatus(Billing.Status.PAID);
 
@@ -162,14 +163,8 @@ public class BillingService {
         return true;
     }
     public List<Billing> getUnpaidBillsByPatientId(Long patientId) {
-        List<Billing> allBills = billingRepository.findBillsByPatientId(patientId);
-        List<Billing> unpaidBills = new ArrayList<>();
-        for (Billing bill : allBills) {
-            if (bill.getStatus() == Billing.Status.UNPAID) {
-                unpaidBills.add(bill);
-            }
-        }
-        return unpaidBills;
+        // Optimized: Use database query instead of filtering in Java
+        return billingRepository.findUnpaidBillsByPatientId(patientId);
     }
     
 

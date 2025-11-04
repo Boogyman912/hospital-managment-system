@@ -6,7 +6,11 @@ import java.time.LocalDate;
 import java.util.List;
 import com.hms.hospital_management_system.models.Prescription;
 @Entity
-@Table(name = "billing")
+@Table(name = "billing", indexes = {
+    @Index(name = "idx_billing_patient", columnList = "patient_id"),
+    @Index(name = "idx_billing_status", columnList = "status"),
+    @Index(name = "idx_billing_prescription", columnList = "prescription_id")
+})
 public class Billing {
 
     @Id

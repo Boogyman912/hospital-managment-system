@@ -36,25 +36,19 @@ public class FeedbackService {
     public Feedback addFeedback(Feedback feedback) {
         try{
             Long doctorId = feedback.getAppointment().getDoctor().getDoctor_id();
-            Double rating = feedback.getRating();
-
-            //writing logic for calculating new average rating for doctor
-            List<Feedback> existingFeedbacks = feedbackRepository.findFeedbacksByDoctorId(doctorId).stream()
-                .map(dto -> feedbackRepository.findById(dto.feedbackId()).orElse(null))
-                .filter(Objects::nonNull)
-                .toList(); 
-            double totalRating = existingFeedbacks.stream()
-                .mapToDouble(Feedback::getRating)
-                .sum();
-            totalRating += rating; // include new rating
-            int newCount = existingFeedbacks.size() + 1;
-            double newAverageRating = totalRating / newCount;
+            
+            // Save the feedback first
+            Feedback savedFeedback = feedbackRepository.save(feedback);
+            
+            // Calculate new average rating efficiently using database aggregation
+            Double newAverageRating = feedbackRepository.calculateAverageRatingByDoctorId(doctorId);
+            
             // Update doctor's rating
             Doctor doctor = feedback.getAppointment().getDoctor();
-            doctor.setRating(newAverageRating);
-            // Save the updated doctor entity if you have a DoctorRepository (not shown here)
+            doctor.setRating(newAverageRating != null ? newAverageRating : 0.0);
             doctorRepository.save(doctor);
-            return feedbackRepository.save(feedback);
+            
+            return savedFeedback;
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Error adding feedback: " + e.getMessage());
@@ -70,30 +64,17 @@ public class FeedbackService {
                 return;
             }
             Long doctorId = feedback.getAppointment().getDoctor().getDoctor_id();
-            Double rating = feedback.getRating();
 
-            //writing logic for calculating new average rating for doctor
-            List<Feedback> existingFeedbacks = feedbackRepository.findFeedbacksByDoctorId(doctorId).stream()
-                .map(dto -> feedbackRepository.findById(dto.feedbackId()).orElse(null))
-                .filter(Objects::nonNull)
-                .toList(); 
-            double totalRating = existingFeedbacks.stream()
-                .mapToDouble(Feedback::getRating)
-                .sum();
-            totalRating -= rating; // include new rating
-            int newCount = existingFeedbacks.size() - 1;
-            double newAverageRating;
-            if(newCount>0){
-                newAverageRating = totalRating / newCount;
-            }else{
-                newAverageRating = 0.0;
-            }
+            // Delete the feedback first
+            feedbackRepository.deleteById(id);
+            
+            // Recalculate average rating efficiently using database aggregation
+            Double newAverageRating = feedbackRepository.calculateAverageRatingByDoctorId(doctorId);
+            
             // Update doctor's rating
             Doctor doctor = feedback.getAppointment().getDoctor();
-            doctor.setRating(newAverageRating);
-            // Save the updated doctor entity if you have a DoctorRepository (not shown here)
+            doctor.setRating(newAverageRating != null ? newAverageRating : 0.0);
             doctorRepository.save(doctor);
-            feedbackRepository.deleteById(id);
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Error deleting feedback: " + e.getMessage());

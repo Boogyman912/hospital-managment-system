@@ -34,8 +34,9 @@ public interface SlotRepository extends JpaRepository<Slot, Long> {
         @Param("doctor_id") Long doctor_id
     );
 
+     // Optimized: Filter dates in database query instead of in Java code
      @Query("SELECT s FROM Slot s " +
-           "WHERE s.doctor.id = :doctor_id " + // Access the Doctor's ID property
+           "WHERE s.doctor.doctor_id = :doctor_id " +
            "AND s.status = :status " +
            "AND s.date >= CURRENT_DATE") // Filter for dates that are today or in the future
     List<Slot> findByDoctorAndStatus(
