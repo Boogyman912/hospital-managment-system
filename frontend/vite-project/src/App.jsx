@@ -1,8 +1,5 @@
-
-import React, { useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
-import AppointmentBooking from "./AppointmentBooking";
-import DoctorManagement from "./DoctorManagement";
 import Header from "./components/Header.jsx";
 import Footer from "./components/Footer.jsx";
 
@@ -22,7 +19,12 @@ const Icon = ({ name, className }) => (
 
 const iconPaths = {
   plus: (
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M12 4v16m8-8H4"
+    />
   ),
   clinic: (
     <path
@@ -138,7 +140,7 @@ const AboutUs = () => (
   </section>
 );
 
-const Booking = ({ onStartBooking }) => (
+const Booking = () => (
   <section id="booking" className="bg-gray-900 text-white py-20 px-8 md:px-16">
     <div className="container mx-auto grid md:grid-cols-2 gap-12 items-center">
       <div>
@@ -152,12 +154,12 @@ const Booking = ({ onStartBooking }) => (
           and receipt are generated, and notifications are sent via WhatsApp and
           email.
         </p>
-        <button
-          onClick={onStartBooking}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition-colors text-lg"
+        <Link
+          to="/doctors"
+          className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition-colors text-lg"
         >
           Schedule Your Visit
-        </button>
+        </Link>
       </div>
       <div className="flex justify-center">
         <img
@@ -170,57 +172,19 @@ const Booking = ({ onStartBooking }) => (
   </section>
 );
 
-const Login = () => (
-  <section id="login" className="bg-gray-900 text-white py-20 px-8 md:px-16">
-    <div className="container mx-auto max-w-md">
-      <h2 className="text-2xl font-bold mb-6">Doctors Login</h2>
-      <form className="space-y-4">
-        <input
-          type="text"
-          placeholder="Username"
-          className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        <button
-          type="submit"
-          className="w-full bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-4 rounded-lg transition-colors"
-        >
-          Login
-        </button>
-      </form>
-      <p className="text-gray-500 text-xs mt-4 text-center">
-        John Doe, CEO of ABC Company
-      </p>
-    </div>
-  </section>
-);
-
 // --- Main App Component ---
 
 export default function App() {
-  const [currentView, setCurrentView] = useState("home");
-
-  const handleNavigate = (view) => setCurrentView(view);
-
-  if (currentView === "booking") return <AppointmentBooking />;
-  if (currentView === "doctors") return <DoctorManagement />;
-
   return (
     <div className="bg-gray-900 font-sans">
-      <Header onNavigate={handleNavigate} />
+      <Header />
       <main>
         <Hero />
         <Features />
         <AboutUs />
-        <Booking onStartBooking={() => setCurrentView("booking")} />
-        <Login />
+        <Booking />
       </main>
       <Footer />
     </div>
   );
 }
-
