@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import Card from "../../components/ui/Card.jsx";
 import Table from "../../components/ui/Table.jsx";
 import Modal from "../../components/ui/Modal.jsx";

@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import { memo } from "react";
 
 const Card = memo(function Card({ title, actions, children }) {
   return (

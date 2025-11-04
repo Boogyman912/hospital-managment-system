@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Card from "../../components/ui/Card.jsx";
 import Table from "../../components/ui/Table.jsx";
 import { apiDelete, apiGet } from "../../api.js";
