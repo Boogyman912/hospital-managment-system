@@ -41,25 +41,29 @@ public class BillingService {
             
             System.out.println("\n\n\n\nMedications to process: " + meds.size());
             
-            // Process medications
+            // Cache inventory items to avoid duplicate lookups
+            Map<String, Inventory> inventoryCache = new HashMap<>();
+            
+            // Process medications - lookup inventory items once and cache them
             for (Map<String, String> med : meds) {
                 System.out.println("Processing medication: " + med.get("itemName") + " - " + med.get("brandName"));
-                Inventory item = inventoryService.getInventoryByItemNameAndBrandName(med.get("itemName"), med.get("brandName"));
+                String cacheKey = med.get("itemName") + "|" + med.get("brandName");
+                
+                Inventory item = inventoryCache.get(cacheKey);
+                if (item == null) {
+                    item = inventoryService.getInventoryByItemNameAndBrandName(med.get("itemName"), med.get("brandName"));
+                    if (item != null) {
+                        inventoryCache.put(cacheKey, item);
+                    }
+                }
+                
                 if (item != null) {
                     Double unitPrice = item.getUnitPrice();
                     Integer quantity = Integer.parseInt(med.get("quantity"));
                     quantity = quantity >= item.getQuantity() ? item.getQuantity() : quantity; // Ensure we don't go negative
                     System.out.println("\n\n\n\n\n\n\n\n\n\nItem: " + item.getItemName() + ", Unit Price: " + unitPrice + ", Quantity: " + quantity);
                     amount += unitPrice * quantity;
-                }
-            }
-            
-            // Decrease inventory quantities after calculating total (reduces DB calls during calculation)
-            for (Map<String, String> med : meds) {
-                Inventory item = inventoryService.getInventoryByItemNameAndBrandName(med.get("itemName"), med.get("brandName"));
-                if (item != null) {
-                    Integer quantity = Integer.parseInt(med.get("quantity"));
-                    quantity = quantity >= item.getQuantity() ? item.getQuantity() : quantity;
+                    // Decrease inventory quantity immediately
                     inventoryService.decreaseQuantity(item.getItemId(), quantity);
                 }
             }

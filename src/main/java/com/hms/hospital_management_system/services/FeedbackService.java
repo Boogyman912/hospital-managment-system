@@ -64,15 +64,16 @@ public class FeedbackService {
                 return;
             }
             Long doctorId = feedback.getAppointment().getDoctor().getDoctor_id();
+            Doctor doctor = feedback.getAppointment().getDoctor();
 
             // Delete the feedback first
             feedbackRepository.deleteById(id);
             
             // Recalculate average rating efficiently using database aggregation
+            // This will correctly exclude the deleted feedback since we deleted it first
             Double newAverageRating = feedbackRepository.calculateAverageRatingByDoctorId(doctorId);
             
-            // Update doctor's rating
-            Doctor doctor = feedback.getAppointment().getDoctor();
+            // Update doctor's rating with the recalculated average
             doctor.setRating(newAverageRating != null ? newAverageRating : 0.0);
             doctorRepository.save(doctor);
         } catch (Exception e) {

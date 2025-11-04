@@ -41,6 +41,8 @@ public class DoctorService {
     }
 
     // Optimized: Bulk create doctors using saveAll for better performance
+    // Note: This uses batch insert which is more efficient but has all-or-nothing semantics.
+    // If any doctor fails validation, the entire batch will fail (unlike the previous one-by-one approach).
     @Transactional
     public int createDoctors(List<Doctor> doctors) {
         if (doctors == null || doctors.isEmpty()) {
