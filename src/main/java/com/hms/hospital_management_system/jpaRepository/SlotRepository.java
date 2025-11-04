@@ -35,6 +35,7 @@ public interface SlotRepository extends JpaRepository<Slot, Long> {
     );
 
      // Optimized: Filter dates in database query instead of in Java code
+     // Uses doctor.doctor_id field name (as defined in Doctor entity)
      @Query("SELECT s FROM Slot s " +
            "WHERE s.doctor.doctor_id = :doctor_id " +
            "AND s.status = :status " +

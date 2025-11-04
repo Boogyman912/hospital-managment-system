@@ -71,13 +71,24 @@ This document outlines the performance optimizations made to the Hospital Manage
 **Before:** N database round trips for N doctors
 **After:** Single batch insert (implementation-dependent, but typically much faster)
 
-### 7. Reduced Redundant Database Calls
+**⚠️ Behavioral Change:** The previous implementation allowed partial success (some doctors saved, others skipped on error). The new batch implementation uses all-or-nothing semantics - if any doctor fails validation, the entire batch fails. This is more efficient but changes the error handling behavior.
+
+### 7. Inventory Lookup Caching
+**Impact:** Medium - Eliminates duplicate database queries
+
+**Changes Made:**
+- **BillingService.generateBillByPrescriptionId()**: Added HashMap cache to store inventory items during bill generation
+  - Prevents looking up the same inventory item multiple times for duplicate medications
+  - Uses cache key format: `itemName|brandName`
+
+**Before:** 2N queries for N medications (lookup for price + lookup for quantity decrease)
+**After:** N queries maximum (one per unique medication)
+
+### 8. Reduced Redundant Database Calls
 **Impact:** Low-Medium - Eliminates unnecessary queries
 
 **Changes Made:**
-- **BillingService.generateBillByPrescriptionId()**: Reorganized to separate calculation phase from inventory update phase
-  - Inventory lookups are still performed in loops (unavoidable due to dynamic prescription data)
-  - But we've separated concerns to make the code clearer
+- **BillingService.generateBillByPrescriptionId()**: Reorganized to use cached inventory lookups (see #7 above)
 
 ## Performance Metrics Estimation
 

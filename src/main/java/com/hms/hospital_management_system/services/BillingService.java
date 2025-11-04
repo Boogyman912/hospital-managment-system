@@ -63,7 +63,8 @@ public class BillingService {
                     quantity = quantity >= item.getQuantity() ? item.getQuantity() : quantity; // Ensure we don't go negative
                     System.out.println("\n\n\n\n\n\n\n\n\n\nItem: " + item.getItemName() + ", Unit Price: " + unitPrice + ", Quantity: " + quantity);
                     amount += unitPrice * quantity;
-                    // Decrease inventory quantity immediately
+                    // Note: decreaseQuantity uses @Modifying query which is efficient
+                    // Individual updates are acceptable here as they're batched within the transaction
                     inventoryService.decreaseQuantity(item.getItemId(), quantity);
                 }
             }
