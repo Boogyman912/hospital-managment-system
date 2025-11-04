@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import Card from "../../components/ui/Card.jsx";
 import Table from "../../components/ui/Table.jsx";
 import Modal from "../../components/ui/Modal.jsx";
@@ -26,7 +26,10 @@ export default function DoctorAppointments() {
   const [prescError, setPrescError] = useState("");
   const [prescSuccess, setPrescSuccess] = useState("");
 
-  const handlePrescriptionSubmit = async () => {
+  // Memoize today's date to avoid recalculating on every render
+  const today = useMemo(() => new Date().toLocaleDateString("en-CA"), []);
+
+  const handlePrescriptionSubmit = useCallback(async () => {
     setPrescError("");
     setPrescSuccess("");
     if (!prescFor.appointmentId) {
@@ -72,7 +75,7 @@ export default function DoctorAppointments() {
     } finally {
       setPrescSubmitting(false);
     }
-  };
+  }, [prescFor, medications, labTests, instructions]);
   const columns = [
     {
       key: "slot",
@@ -86,10 +89,9 @@ export default function DoctorAppointments() {
     },
     { key: "appointmentStatus", header: "Status" },
   ];
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     setError("");
-    const prev = data;
     try {
       const res = await apiGet("/api/doctor/appointments");
       const list = Array.isArray(res)
@@ -98,17 +100,16 @@ export default function DoctorAppointments() {
         ? res.data
         : [];
       setData(list);
-    } catch (e) {
-      setData(prev);
+    } catch {
       setError("Failed to load appointments. Please try again later.");
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     load();
-  }, []);
+  }, [load]);
   return (
     <Card title="Appointments">
       {loading && <div className="text-sm text-gray-400 mb-2">Loading...</div>}
@@ -117,7 +118,6 @@ export default function DoctorAppointments() {
         columns={columns}
         data={data}
         renderActions={(row) => {
-          const today = new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD in local time
           const isToday = row?.slot?.date === today;
           const isBooked = row?.appointmentStatus === "BOOKED";
           return isBooked ? (

@@ -33,7 +33,7 @@ export default function Slots() {
       } else {
         setSlots([]);
       }
-    } catch (err) {
+    } catch {
       // rollback: keep current slots and show friendly error
       setError("Failed to load slots. Please try again later.");
     } finally {

@@ -1,21 +1,14 @@
-import React from "react";
-import { useState } from "react";
+import React, { memo } from "react";
+import { useState, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Header from "./components/Header.jsx";
 import Footer from "./components/Footer.jsx";
 import { apiGet, apiPost } from "./api.js";
 
-// Fallback mock data when backend returns no doctors or errors
-const mockDoctors = [
-  { doctor_id: 101, name: "Dr. Mock One", specialization: "General Medicine" },
-  { doctor_id: 102, name: "Dr. Mock Two", specialization: "Pediatrics" },
-  { doctor_id: 103, name: "Dr. Mock Three", specialization: "Dermatology" },
-];
-
 // Doctors list is fetched from backend only
 
 // --- SVG Icon for Default Avatar ---
-const DoctorIcon = () => (
+const DoctorIcon = memo(() => (
   <svg
     className="w-16 h-16 text-gray-400"
     fill="currentColor"
@@ -28,10 +21,12 @@ const DoctorIcon = () => (
       clipRule="evenodd"
     ></path>
   </svg>
-);
+));
+
+DoctorIcon.displayName = "DoctorIcon";
 
 // --- Doctor Card Component ---
-const DoctorCard = ({ doctor, onBook }) => {
+const DoctorCard = memo(({ doctor, onBook }) => {
   return (
     <div className="bg-gray-800 rounded-xl p-6 flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6 transform hover:scale-105 transition-transform duration-300 shadow-lg">
       {/* Always show default icon (backend doesn't provide profile pics) */}
@@ -54,7 +49,9 @@ const DoctorCard = ({ doctor, onBook }) => {
       </div>
     </div>
   );
-};
+});
+
+DoctorCard.displayName = "DoctorCard";
 
 // --- Main Doctors List Page Component ---
 export default function DoctorsListPage() {
@@ -114,7 +111,7 @@ export default function DoctorsListPage() {
     };
   }, []);
 
-  async function handleOpenForm(doctor) {
+  const handleOpenForm = useCallback(async (doctor) => {
     setSelectedDoctor(doctor);
     setError("");
     setSuccess("");
@@ -136,14 +133,14 @@ export default function DoctorsListPage() {
     } finally {
       setLoadingSlots(false);
     }
-  }
+  }, []);
 
-  function handleChange(e) {
+  const handleChange = useCallback((e) => {
     const { name, value } = e.target;
     setForm((f) => ({ ...f, [name]: value }));
-  }
+  }, []);
 
-  async function handleSubmit(e) {
+  const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
     if (!selectedDoctor) return;
     if (!selectedSlot) {
@@ -206,7 +203,7 @@ export default function DoctorsListPage() {
     } finally {
       setSubmitting(false);
     }
-  }
+  }, [selectedDoctor, selectedSlot, form, navigate]);
 
   return (
     <div className="bg-gray-900 min-h-screen flex flex-col">

@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Header from "../components/Header.jsx";
 import Footer from "../components/Footer.jsx";
-import { apiPost, apiGet } from "../api.js";
+import { apiPost } from "../api.js";
 
 export default function PaymentPage() {
   const location = useLocation();
@@ -33,6 +33,38 @@ export default function PaymentPage() {
   }, [location.state, navigate]);
 
   // Auto-cancel after 10 minutes if payment not completed
+  const handleCancelAppointment = useCallback(async () => {
+    if (!appointmentId || !slotId) return;
+
+    setCancelling(true);
+    setError("");
+    setSuccess("");
+
+    try {
+      // Cancel the appointment
+      await apiPost(
+        `/api/appointments/cancel/appointment/${appointmentId}`,
+        {}
+      );
+
+      // Release the slot
+      const slotResponse = await apiPost(`/api/slots/${slotId}/release`, {});
+
+      if (slotResponse.success) {
+        setSuccess("Appointment cancelled and slot released successfully");
+        setTimeout(() => {
+          navigate("/doctors");
+        }, 2000);
+      } else {
+        setError("Appointment cancelled but failed to release slot");
+      }
+    } catch {
+      setError("Failed to cancel appointment. Please try again later.");
+    } finally {
+      setCancelling(false);
+    }
+  }, [appointmentId, slotId, navigate]);
+
   useEffect(() => {
     if (paymentStatus === "PENDING") {
       const timer = setTimeout(() => {
@@ -41,7 +73,7 @@ export default function PaymentPage() {
 
       return () => clearTimeout(timer);
     }
-  }, [paymentStatus]);
+  }, [paymentStatus, handleCancelAppointment]);
 
   const handlePayment = async () => {
     if (!appointmentId) return;
@@ -73,42 +105,10 @@ export default function PaymentPage() {
       } else {
         setError("Failed to confirm payment. Please try again.");
       }
-    } catch (err) {
+    } catch {
       setError("Something went wrong with payment. Please try again later.");
     } finally {
       setSubmitting(false);
-    }
-  };
-
-  const handleCancelAppointment = async () => {
-    if (!appointmentId || !slotId) return;
-
-    setCancelling(true);
-    setError("");
-    setSuccess("");
-
-    try {
-      // Cancel the appointment
-      await apiPost(
-        `/api/appointments/cancel/appointment/${appointmentId}`,
-        {}
-      );
-
-      // Release the slot
-      const slotResponse = await apiPost(`/api/slots/${slotId}/release`, {});
-
-      if (slotResponse.success) {
-        setSuccess("Appointment cancelled and slot released successfully");
-        setTimeout(() => {
-          navigate("/doctors");
-        }, 2000);
-      } else {
-        setError("Appointment cancelled but failed to release slot");
-      }
-    } catch (err) {
-      setError("Failed to cancel appointment. Please try again later.");
-    } finally {
-      setCancelling(false);
     }
   };
 

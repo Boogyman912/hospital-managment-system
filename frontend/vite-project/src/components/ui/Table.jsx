@@ -1,6 +1,6 @@
-import React from "react";
+import React, { memo } from "react";
 
-export default function Table({ columns, data, renderActions }) {
+const Table = memo(function Table({ columns, data, renderActions }) {
   return (
     <div className="overflow-x-auto">
       <table className="min-w-full text-sm text-gray-200">
@@ -43,4 +43,6 @@ export default function Table({ columns, data, renderActions }) {
       </table>
     </div>
   );
-}
+});
+
+export default Table;

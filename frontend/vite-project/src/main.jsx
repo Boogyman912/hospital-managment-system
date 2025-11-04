@@ -7,6 +7,7 @@ import DoctorsListPage from "./DoctorsListPage.jsx";
 import RegisterDoctor from "./RegisterDoctor.jsx";
 import Login from "./pages/Login.jsx";
 import { AuthProvider } from "./auth/AuthContext.jsx";
+import { Roles } from "./auth/roles.js";
 import RoleRedirect from "./auth/RoleRedirect.jsx";
 import ProtectedRoute from "./auth/ProtectedRoute.jsx";
 import AdminLayout from "./layouts/AdminLayout.jsx";
@@ -26,7 +27,6 @@ import StaffDashboard from "./pages/staff/StaffDashboard.jsx";
 import Rooms from "./pages/staff/Rooms.jsx";
 import PaymentPage from "./pages/PaymentPage.jsx";
 import PatientAppointments from "./pages/PatientAppointments.jsx";
-import { Roles } from "./auth/AuthContext.jsx";
 
 // Create a component that wraps the router with AuthProvider
 function AppWithAuth() {

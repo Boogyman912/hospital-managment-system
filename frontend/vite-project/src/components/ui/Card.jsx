@@ -1,6 +1,6 @@
-import React from "react";
+import React, { memo } from "react";
 
-export default function Card({ title, actions, children }) {
+const Card = memo(function Card({ title, actions, children }) {
   return (
     <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
       {(title || actions) && (
@@ -12,4 +12,6 @@ export default function Card({ title, actions, children }) {
       <div className="text-gray-200">{children}</div>
     </div>
   );
-}
+});
+
+export default Card;

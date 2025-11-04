@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Roles, useAuth } from "../auth/AuthContext.jsx";
+import { useAuth } from "../auth/AuthContext.jsx";
+import { Roles } from "../auth/roles.js";
 import Header from "../components/Header.jsx";
 
 export default function Login() {

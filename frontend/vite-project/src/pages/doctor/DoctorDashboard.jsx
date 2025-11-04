@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import Card from "../../components/ui/Card.jsx";
 import { apiGet } from "../../api.js";
 
@@ -6,6 +6,9 @@ export default function DoctorDashboard() {
   const [todayCount, setTodayCount] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  // Memoize today's date to avoid recalculating on every render
+  const today = useMemo(() => new Date().toLocaleDateString("en-CA"), []);
 
   useEffect(() => {
     const load = async () => {
@@ -18,21 +21,20 @@ export default function DoctorDashboard() {
           : Array.isArray(res?.data)
           ? res.data
           : [];
-        const today = new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD
         const count = list.filter(
           (apt) =>
             String(apt?.appointmentStatus).toUpperCase() === "BOOKED" &&
             apt?.slot?.date === today
         ).length;
         setTodayCount(count);
-      } catch (e) {
+      } catch {
         setError("Failed to load appointments.");
       } finally {
         setLoading(false);
       }
     };
     load();
-  }, []);
+  }, [today]);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -1,6 +1,7 @@
 import React from "react";
 import { Navigate } from "react-router-dom";
-import { Roles, useAuth } from "./AuthContext.jsx";
+import { useAuth } from "./AuthContext.jsx";
+import { Roles } from "./roles.js";
 
 export default function RoleRedirect() {
   const { user, isReady } = useAuth();
