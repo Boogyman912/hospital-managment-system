@@ -30,6 +30,10 @@ public interface BillingRepository extends JpaRepository<Billing, Long> {
     @Query("select b from Billing b where b.prescription.patient.patientId = :patientId")
     List<Billing> findBillsByPatientId(Long patientId);
 
+    // Find unpaid bills by patient ID - optimized query to avoid filtering in Java
+    @Query("select b from Billing b where b.patient.patientId = :patientId AND b.status = com.hms.hospital_management_system.models.Billing.Status.UNPAID")
+    List<Billing> findUnpaidBillsByPatientId(Long patientId);
+
     // it is one to one mapping so it will return only one bill
     @Query("select b from Billing b where b.prescription.prescriptionId = :prescriptionId")
     Billing findBillByPrescriptionId(Long prescriptionId);

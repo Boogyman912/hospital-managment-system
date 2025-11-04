@@ -17,6 +17,12 @@ public interface FeedbackRepository extends JpaRepository<Feedback, Long> {
            "WHERE a.doctor.doctor_id = :doctorId")
     List<FeedbackDTO> findFeedbacksByDoctorId(@Param("doctorId") Long doctorId);
 
+    // Calculate average rating for a doctor efficiently using aggregation
+    @Query("SELECT AVG(f.rating) FROM Feedback f " +
+           "LEFT JOIN f.appointment a " +
+           "WHERE a.doctor.doctor_id = :doctorId")
+    Double calculateAverageRatingByDoctorId(@Param("doctorId") Long doctorId);
+
 
     @Query("select f from Feedback f where f.patient.patientId = :patient_id")
 

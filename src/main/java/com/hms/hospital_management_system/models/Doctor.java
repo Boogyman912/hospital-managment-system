@@ -3,7 +3,11 @@ package com.hms.hospital_management_system.models;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "doctors")
+@Table(name = "doctors", indexes = {
+    @Index(name = "idx_doctor_specialization", columnList = "specialization"),
+    @Index(name = "idx_doctor_email", columnList = "email"),
+    @Index(name = "idx_doctor_phone", columnList = "phone_number")
+})
 public class Doctor {
 
     @Id

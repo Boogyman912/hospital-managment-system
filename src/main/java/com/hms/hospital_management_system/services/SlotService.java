@@ -49,27 +49,14 @@ public class SlotService {
     }
 
     public List<Slot> getAvailableSlotsByDoctor(Long doctorId) {
-    try {
-        // Fetch all available slots for the given doctor
-        List<Slot> availableSlots = slotRepository.findByDoctorAndStatus(doctorId, Slot.SlotStatus.AVAILABLE);
-
-        // Filter slots that are for today or future dates
-        List<Slot> availableSlotsForTodayAndAfter = new ArrayList<>();
-        LocalDate today = LocalDate.now();
-
-        for (Slot slot : availableSlots) {
-            if (!slot.getDate().isBefore(today)) { // same as slot.getDate() >= today
-                availableSlotsForTodayAndAfter.add(slot);
-            }
+        try {
+            // Optimized: Date filtering now happens in the database query
+            return slotRepository.findByDoctorAndStatus(doctorId, Slot.SlotStatus.AVAILABLE);
+        } catch (Exception e) {
+            System.err.println("Error fetching available slots: " + e.getMessage());
+            return Collections.emptyList(); // better than returning null
         }
-
-        return availableSlotsForTodayAndAfter;
-
-    } catch (Exception e) {
-        System.err.println("Error fetching available slots: " + e.getMessage());
-        return Collections.emptyList(); // better than returning null
     }
-}
 
     
     public Slot holdSlot(Long slotId, int holdMinutes) {

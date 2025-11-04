@@ -40,19 +40,22 @@ public class DoctorService {
         }
     }
 
-    // ADDED: Bulk create doctors with simple counter of successfully saved entries
+    // Optimized: Bulk create doctors using saveAll for better performance
+    // Note: This uses batch insert which is more efficient but has all-or-nothing semantics.
+    // If any doctor fails validation, the entire batch will fail (unlike the previous one-by-one approach).
+    @Transactional
     public int createDoctors(List<Doctor> doctors) {
-        int count = 0;
-        for (Doctor doctor : doctors) {
-            try {
-                doctorRepository.save(doctor);
-                count++;
-            } catch (Exception e) {
-                // continue saving others; log and skip invalid entries
-                System.out.println("Error saving doctor (skipped): " + e.getMessage());
-            }
+        if (doctors == null || doctors.isEmpty()) {
+            return 0;
         }
-        return count;
+        try {
+            // Use saveAll for batch insert which is more efficient than saving one by one
+            List<Doctor> savedDoctors = doctorRepository.saveAll(doctors);
+            return savedDoctors.size();
+        } catch (Exception e) {
+            System.out.println("Error saving doctors in bulk: " + e.getMessage());
+            return 0;
+        }
     }
 
     public Doctor getDoctorById(Long id) {

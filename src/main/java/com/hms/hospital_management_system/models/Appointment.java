@@ -3,7 +3,12 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 // import com.fasterxml.jackson.annotation.JsonIgnore;
 @Entity
-@Table(name = "appointments")
+@Table(name = "appointments", indexes = {
+    @Index(name = "idx_appointment_doctor", columnList = "doctor_id"),
+    @Index(name = "idx_appointment_patient", columnList = "patient_id"),
+    @Index(name = "idx_appointment_status", columnList = "appointmentStatus"),
+    @Index(name = "idx_appointment_payment", columnList = "paymentStatus")
+})
 public class Appointment {
 
     @Id

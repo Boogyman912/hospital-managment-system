@@ -6,7 +6,11 @@ import java.time.LocalDateTime;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
-@Table(name = "slots")
+@Table(name = "slots", indexes = {
+    @Index(name = "idx_slot_doctor_date_status", columnList = "doctor_id, date, status"),
+    @Index(name = "idx_slot_status", columnList = "status"),
+    @Index(name = "idx_slot_date", columnList = "date")
+})
 public class Slot {
 
     @Id
