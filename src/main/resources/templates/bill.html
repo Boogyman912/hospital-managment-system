@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>Bill</title>
+  <style>
+    body { font-family: Arial, sans-serif; font-size: 12px; }
+    .header { text-align: center; margin-bottom: 16px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border: 1px solid #ddd; padding: 6px; text-align: left; }
+    .right { text-align: right; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h2>Hospital Name</h2>
+    <div>Invoice / Bill</div>
+  </div>
+
+  <div>
+    <strong>Bill ID:</strong> <span th:text="${billing.billId}"></span><br/>
+    <strong>Prescription ID:</strong> <span th:text="${billing.prescription.prescriptionId}"></span><br/>
+    <strong>Patient:</strong> <span th:text="${billing.prescription.patient.name}"></span><br/>
+    <strong>Date:</strong> <span th:text="${#dates.format(billing.paymentDate != null ? billing.paymentDate : billing.createdAt, 'yyyy-MM-dd')}"></span>
+  </div>
+
+  <h4>Items (Medications)</h4>
+  <table>
+    <thead><tr><th>Item</th><th>Brand</th><th>Qty</th><th>Unit Price</th><th class="right">Total</th></tr></thead>
+    <tbody>
+      <tr th:each="med : ${billingItemList}">
+        <td th:text="${med.itemName}"></td>
+        <td th:text="${med.brandName}"></td>
+        <td th:text="${med.quantity}"></td>
+        <td th:text="${med.unitPrice}"></td>
+        <td class="right" th:text="${med.lineTotal}"></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h4>Lab Tests</h4>
+  <table>
+    <thead><tr><th>Test</th><th>Type</th><th class="right">Cost</th></tr></thead>
+    <tbody>
+      <tr th:each="test : ${billing.labTestList}">
+        <td th:text="${test.testName}"></td>
+        <td th:text="${test.testType}"></td>
+        <td class="right" th:text="${test.testCost}"></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3 class="right">Total: <span th:text="${billing.totalAmount}"></span></h3>
+  <div>Status: <span th:text="${billing.status}"></span></div>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>Prescription</title>
+  <style>
+    body { font-family: Arial, sans-serif; font-size: 12px; }
+    .header { text-align: center; margin-bottom: 16px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border: 1px solid #ddd; padding: 6px; text-align: left; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h2>Hospital Name</h2>
+    <div>Prescription</div>
+  </div>
+
+  <div>
+    <strong>Prescription ID:</strong> <span th:text="${prescription.prescriptionId}"></span><br/>
+    <strong>Patient:</strong> <span th:text="${prescription.patient.name}"></span><br/>
+    <strong>Date:</strong> <span th:text="${prescription.dateIssued}"></span>
+  </div>
+
+  <h4>Medications</h4>
+  <table>
+    <thead><tr><th>Item</th><th>Brand</th><th>Qty</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr th:each="med : ${prescription.medications}">
+        <td th:text="${med['itemName']}">Item</td>
+        <td th:text="${med['brandName']}">Brand</td>
+        <td th:text="${med['quantity']}">1</td>
+        <td th:text="${med['note']}">--</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h4>Lab Tests</h4>
+  <table>
+    <thead><tr><th>Test</th><th>Type</th></tr></thead>
+    <tbody>
+      <tr th:each="t : ${prescription.labTests}">
+        <td th:text="${t['testName']}">Test</td>
+        <td th:text="${t['testType']}">Type</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h4>Instructions</h4>
+  <div th:text="${prescription.instructions}">No instructions</div>
+</body>
+</html>
