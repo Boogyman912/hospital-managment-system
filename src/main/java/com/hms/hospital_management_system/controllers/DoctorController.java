@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.hms.hospital_management_system.models.Appointment;
 import com.hms.hospital_management_system.models.Doctor;
+import com.hms.hospital_management_system.models.Inventory;
 import com.hms.hospital_management_system.models.Slot;
 // import com.hms.hospital_management_system.models.Doctor;
 import com.hms.hospital_management_system.models.Prescription;
@@ -22,6 +23,7 @@ import java.util.Collections;
 import com.hms.hospital_management_system.services.AppointmentService;
 // import com.hms.hospital_management_system.services.DoctorService;
 import com.hms.hospital_management_system.services.FeedbackService;
+import com.hms.hospital_management_system.services.InventoryService;
 import com.hms.hospital_management_system.services.PrescriptionService;
 import com.hms.hospital_management_system.services.SlotService;
 import jakarta.transaction.Transactional;
@@ -53,6 +55,8 @@ public class DoctorController {
 
         @Autowired
         private DoctorService doctorService;
+        @Autowired
+        private InventoryService inventoryService;
 
         // Doctor can only see their appointments
         @GetMapping("/appointments")
@@ -69,6 +73,15 @@ public class DoctorController {
                                 appointmentService.getAppointmentsByDoctorId(doctorId);
                 return ResponseEntity.ok(appointments);
         }
+         @GetMapping("/allinventory")
+    public ResponseEntity<List<Inventory>> getAllInventory() {
+        try {
+            List<Inventory> inventory = inventoryService.getAllInventory();
+            return ResponseEntity.ok(inventory);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
 
         @GetMapping("/feedbacks")
         public ResponseEntity<List<FeedbackDTO>> getFeedbacksByDoctorId(Authentication auth)

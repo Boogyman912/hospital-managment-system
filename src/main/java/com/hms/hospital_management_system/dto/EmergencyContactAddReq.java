@@ -2,7 +2,7 @@ package com.hms.hospital_management_system.dto;
 
 public class EmergencyContactAddReq {
    
-    private String  patientPhoneNumber;
+    private String patientPhoneNumber;
 
     private String name;
 

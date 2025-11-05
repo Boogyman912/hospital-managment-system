@@ -1,4 +1,5 @@
 package com.hms.hospital_management_system.controllers;
+
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,9 +18,9 @@ public class InpatientController {
 
     @Autowired
     private InpatientService inpatientService;
-    @Autowired 
+    @Autowired
     private PatientService patientService;
-    @Autowired 
+    @Autowired
     private RoomService roomService;
 
     @GetMapping("/all")
@@ -53,7 +54,8 @@ public class InpatientController {
     }
 
     @GetMapping("/inpatient/{id}")
-    public ResponseEntity<Inpatient> getInpatientById(@PathVariable Long id) throws RuntimeException {
+    public ResponseEntity<Inpatient> getInpatientById(@PathVariable Long id)
+            throws RuntimeException {
         try {
             Inpatient inpatient = inpatientService.getInpatientById(id);
             if (inpatient != null) {
@@ -62,45 +64,51 @@ public class InpatientController {
                 return ResponseEntity.notFound().build();
             }
         } catch (Exception e) {
-             throw new RuntimeException( e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
     }
 
     @PostMapping("/admit")
-    public ResponseEntity<Inpatient> admitPatient(@RequestBody admitPatientRequest req) throws RuntimeException {
+    public ResponseEntity<Inpatient> admitPatient(@RequestBody admitPatientRequest req)
+            throws RuntimeException {
         try {
             String patientPhoneNumber = req.getPatientPhoneNumber();
             Long roomId = req.getRoomId();
             Inpatient inpatient = new Inpatient();
-            inpatient.setPatient(patientService.findByPhoneNumber(patientPhoneNumber).orElseThrow(() -> new RuntimeException("Patient not found")));
-            inpatient.setRoom(roomService.getRoomById(roomId).orElseThrow(() -> new RuntimeException("Room not found")));
+            inpatient.setPatient(patientService.findByPhoneNumber(patientPhoneNumber)
+                    .orElseThrow(() -> new RuntimeException("Patient not found")));
+            inpatient.setRoom(roomService.getRoomById(roomId)
+                    .orElseThrow(() -> new RuntimeException("Room not found")));
             inpatient.setAdmissionDate(LocalDate.now());
             inpatient.setDischargeDate(null);
             inpatient.setIsBilled(false);
             Inpatient admittedInpatient = inpatientService.admitPatient(inpatient);
             return ResponseEntity.ok(admittedInpatient);
         } catch (Exception e) {
-            throw new RuntimeException( e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
     }
 
     @PostMapping("/updateRoom/{id}")
-    public ResponseEntity<Inpatient> updateInpatientRoom(@PathVariable Long id, @RequestBody Inpatient inpatient) throws RuntimeException {
+    public ResponseEntity<Inpatient> updateInpatientRoom(@PathVariable Long id,
+            @RequestBody Inpatient inpatient) throws RuntimeException {
         try {
-            Inpatient updatedInpatient = inpatientService.updateInpatientRoom(id, inpatient.getRoom());
+            Inpatient updatedInpatient =
+                    inpatientService.updateInpatientRoom(id, inpatient.getRoom());
             return ResponseEntity.ok(updatedInpatient);
         } catch (Exception e) {
-            throw new RuntimeException( e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
     }
 
     @PostMapping("/discharge_in_patient/{id}")
-    public ResponseEntity<String> dischargeInPatient(@PathVariable Long id) throws RuntimeException {
+    public ResponseEntity<String> dischargeInPatient(@PathVariable Long id)
+            throws RuntimeException {
         try {
             inpatientService.dischargeInpatient(id);
             return ResponseEntity.ok("Inpatient discharged successfully");
         } catch (Exception e) {
-            throw new RuntimeException( e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
     }
 
