@@ -221,6 +221,8 @@ export default function DoctorAppointments() {
   // Remove lab test with autocomplete cleanup
   const removeLabTest = useCallback((idx) => {
     setLabTests((arr) => arr.filter((_, i) => i !== idx));
+    // Clean up all autocomplete states since indices will shift
+    setAutocompleteStates({});
   }, []);
   return (
     <Card title="Appointments">
@@ -616,7 +618,7 @@ export default function DoctorAppointments() {
                       }}
                       type="text"
                       inputMode="numeric"
-                      pattern="[0-9]*"
+                      pattern="[1-9][0-9]*"
                       aria-label="Medication quantity"
                     />
                     <input
