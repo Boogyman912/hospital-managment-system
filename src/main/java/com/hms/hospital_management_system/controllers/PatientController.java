@@ -24,6 +24,7 @@ import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/api/home")
+@CrossOrigin(origins = "*")
 public class PatientController {
 
     @Autowired

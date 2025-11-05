@@ -8,13 +8,7 @@ import { apiGet } from "../api.js";
 const handleDownloadReceipt = (appointment) => {
   if (!appointment) return;
 
-  // Check if PDF URL exists from backend and use it directly
-  if (appointment.receipt?.pdfUrl) {
-    window.open(appointment.receipt.pdfUrl, "_blank");
-    return;
-  }
-
-  // Fallback to HTML print functionality for cases where pdfUrl is not available
+  // Create receipt data from appointment
   const receiptData = {
     appointmentId: appointment.appointmentId,
     doctorName: appointment.doctor?.name || "N/A",
@@ -29,7 +23,7 @@ const handleDownloadReceipt = (appointment) => {
     timestamp: appointment.receipt?.timestamp || new Date().toISOString(),
   };
 
-  // Create a professional HTML receipt
+  // Create a professional HTML receipt using HTML and print functionality
   const receiptHTML = `
     <!DOCTYPE html>
     <html>
@@ -52,15 +46,23 @@ const handleDownloadReceipt = (appointment) => {
       
       <div class="receipt-details">
         <div><strong>Appointment ID:</strong> ${receiptData.appointmentId}</div>
-        <div><strong>Date:</strong> ${new Date(receiptData.timestamp).toLocaleDateString()}</div>
-        <div><strong>Time:</strong> ${new Date(receiptData.timestamp).toLocaleTimeString()}</div>
+        <div><strong>Date:</strong> ${new Date(
+          receiptData.timestamp
+        ).toLocaleDateString()}</div>
+        <div><strong>Time:</strong> ${new Date(
+          receiptData.timestamp
+        ).toLocaleTimeString()}</div>
         <div><strong>Patient Name:</strong> ${receiptData.patientName}</div>
         <div><strong>Patient Phone:</strong> ${receiptData.patientPhone}</div>
         <div><strong>Doctor:</strong> ${receiptData.doctorName}</div>
-        <div><strong>Specialization:</strong> ${receiptData.doctorSpecialization}</div>
+        <div><strong>Specialization:</strong> ${
+          receiptData.doctorSpecialization
+        }</div>
         <div><strong>Appointment Date:</strong> ${receiptData.slotDate}</div>
         <div><strong>Appointment Time:</strong> ${receiptData.slotTime}</div>
-        <div><strong>Appointment Type:</strong> ${receiptData.appointmentType}</div>
+        <div><strong>Appointment Type:</strong> ${
+          receiptData.appointmentType
+        }</div>
         <div><strong>Payment Method:</strong> ${receiptData.paymentMethod}</div>
       </div>
       
@@ -95,7 +97,7 @@ export default function PatientAppointments() {
   const [hasSearched, setHasSearched] = useState(false);
 
   // Helper function to sanitize phone number input
-  const sanitizePhoneNumber = (value) => value.replace(/\D/g, '');
+  const sanitizePhoneNumber = (value) => value.replace(/\D/g, "");
 
   const columns = [
     {
@@ -134,20 +136,22 @@ export default function PatientAppointments() {
     setError("");
     setHasSearched(true);
     try {
-      const res = await apiGet(`/api/patient/appointment/${phoneNumber}`);
+      const res = await apiGet(`/api/home/appointment/${phoneNumber}`);
       const list = Array.isArray(res)
         ? res
         : Array.isArray(res?.appointments)
         ? res.appointments
         : [];
       setData(list);
-      
+
       if (list.length === 0) {
         setError("No appointments found for this phone number.");
       }
     } catch (err) {
       // Show friendly message on error
-      setError(err?.message || "Failed to load appointments. Please try again later.");
+      setError(
+        err?.message || "Failed to load appointments. Please try again later."
+      );
       setData([]);
     } finally {
       setLoading(false);
@@ -172,15 +176,21 @@ export default function PatientAppointments() {
       <div className="flex-1 flex items-center justify-center p-4">
         <div className="w-full max-w-4xl">
           <div className="bg-gray-800 border border-gray-700 rounded-lg p-6 mb-4">
-            <h1 className="text-2xl font-semibold mb-4 text-white">My Appointments</h1>
-            <p className="text-gray-400 mb-4">Enter your phone number to view your appointments</p>
-            
+            <h1 className="text-2xl font-semibold mb-4 text-white">
+              My Appointments
+            </h1>
+            <p className="text-gray-400 mb-4">
+              Enter your phone number to view your appointments
+            </p>
+
             <div className="flex gap-2">
               <input
                 type="tel"
                 className="flex-1 px-3 py-2 bg-gray-900 border border-gray-700 rounded text-white"
                 value={phoneNumber}
-                onChange={(e) => setPhoneNumber(sanitizePhoneNumber(e.target.value))}
+                onChange={(e) =>
+                  setPhoneNumber(sanitizePhoneNumber(e.target.value))
+                }
                 placeholder="Enter phone number (10-15 digits)"
                 maxLength="15"
                 onKeyDown={(e) => {
@@ -197,7 +207,7 @@ export default function PatientAppointments() {
                 {loading ? "Loading..." : "Search"}
               </button>
             </div>
-            
+
             {error && <div className="mt-3 text-red-400 text-sm">{error}</div>}
           </div>
 
