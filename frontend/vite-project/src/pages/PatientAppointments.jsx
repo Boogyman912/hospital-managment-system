@@ -116,7 +116,13 @@ export default function PatientAppointments() {
     setError("");
     try {
       // Get patient phone number from localStorage (set during login)
-      const user = JSON.parse(localStorage.getItem("user") || "{}");
+      let user = {};
+      try {
+        user = JSON.parse(localStorage.getItem("user") || "{}");
+      } catch {
+        // If parsing fails, use empty object
+        user = {};
+      }
       const phoneNumber = user.phoneNumber;
 
       if (!phoneNumber) {
