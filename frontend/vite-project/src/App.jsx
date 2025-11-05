@@ -69,8 +69,7 @@ const Hero = () => (
       </h2>
       <p className="text-xl md:text-2xl mt-2">Your Health, Our Priority.</p>
       <p className="mt-4 max-w-lg">
-        Brief about the hospital and its commitment to patient care and
-        excellence in medical services.
+        Comprehensive hospital management solution streamlining patient care, staff operations, and administrative tasks. Experience seamless appointment scheduling, real-time inventory tracking, and integrated billing systems.
       </p>
     </div>
   </section>
@@ -82,18 +81,18 @@ const Features = () => (
       {[
         {
           icon: "plus",
-          title: "Feature One",
-          desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis.",
+          title: "24/7 Patient Care",
+          desc: "Round-the-clock medical services with comprehensive patient management, emergency contact tracking, and instant appointment confirmations via WhatsApp and email.",
         },
         {
           icon: "clinic",
-          title: "Specialty Clinics",
-          desc: "Etiam sit amet orci eget eros faucibus tincidunt. Duis leo. Sed fringilla mauris sit amet nibh.",
+          title: "Advanced Facilities",
+          desc: "State-of-the-art infrastructure with real-time room availability tracking, advanced lab diagnostics, and automated inventory management for medical supplies.",
         },
         {
           icon: "user",
-          title: "Patient Resources",
-          desc: "Donec sodales sagittis magna. Sed consequat, leo eget bibendum sodales, augue velit cursus nunc.",
+          title: "Digital Health Records",
+          desc: "Secure electronic medical records with complete patient history, prescription tracking, lab results, and integrated billing for seamless healthcare delivery.",
         },
       ].map((f, i) => (
         <div key={i} className="feature-item">
