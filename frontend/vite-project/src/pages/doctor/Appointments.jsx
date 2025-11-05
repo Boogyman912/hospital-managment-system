@@ -214,13 +214,8 @@ export default function DoctorAppointments() {
   // Remove medication with autocomplete cleanup
   const removeMedication = useCallback((idx) => {
     setMedications((arr) => arr.filter((_, i) => i !== idx));
-    // Clean up autocomplete states for this medication
-    setAutocompleteStates((prev) => {
-      const newStates = { ...prev };
-      delete newStates[`item-${idx}`];
-      delete newStates[`brand-${idx}`];
-      return newStates;
-    });
+    // Clean up all autocomplete states since indices will shift
+    setAutocompleteStates({});
   }, []);
 
   // Remove lab test with autocomplete cleanup
@@ -238,7 +233,7 @@ export default function DoctorAppointments() {
           const isToday = row?.slot?.date === today;
           const isBooked = row?.appointmentStatus === "BOOKED";
           const hasPrescription = row?.prescription != null;
-          return isBooked && !hasPrescription ? (
+          return isBooked ? (
             <>
               <button
                 onClick={() => {
@@ -250,7 +245,7 @@ export default function DoctorAppointments() {
               >
                 View
               </button>
-              {isToday && (
+              {isToday && !hasPrescription && (
                 <button
                   onClick={async () => {
                     setPrescError("");
