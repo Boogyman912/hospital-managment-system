@@ -1,6 +1,18 @@
+import { useEffect, useState, useCallback } from "react";
+import Card from "../components/ui/Card.jsx";
+import Table from "../components/ui/Table.jsx";
+import { apiGet } from "../api.js";
+
 const handleDownloadReceipt = (appointment) => {
   if (!appointment) return;
 
+  // Check if PDF URL exists from backend and use it directly
+  if (appointment.receipt?.pdfUrl) {
+    window.open(appointment.receipt.pdfUrl, "_blank");
+    return;
+  }
+
+  // Fallback to HTML print functionality for cases where pdfUrl is not available
   const receiptData = {
     appointmentId: appointment.appointmentId,
     doctorName: appointment.doctor?.name || "N/A",
@@ -72,3 +84,92 @@ const handleDownloadReceipt = (appointment) => {
     printWindow.print();
   };
 };
+
+export default function PatientAppointments() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [data, setData] = useState([]);
+
+  const columns = [
+    {
+      key: "slot",
+      header: "Date",
+      render: (slot) => (slot?.date ? slot.date : "-"),
+    },
+    {
+      key: "slot",
+      header: "Time",
+      render: (slot) => (slot?.time ? slot.time : "-"),
+    },
+    {
+      key: "doctor",
+      header: "Doctor",
+      render: (doctor) =>
+        doctor ? `${doctor.name} (${doctor.specialization})` : "N/A",
+    },
+    { key: "appointmentStatus", header: "Status" },
+    { key: "paymentStatus", header: "Payment" },
+  ];
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError("");
+    try {
+      // Get patient phone number from localStorage (set during login)
+      let user = {};
+      try {
+        user = JSON.parse(localStorage.getItem("user") || "{}");
+      } catch {
+        // If parsing fails, use empty object
+        user = {};
+      }
+      const phoneNumber = user.phoneNumber;
+
+      if (!phoneNumber) {
+        setError("Please log in to view your appointments.");
+        setLoading(false);
+        return;
+      }
+
+      const res = await apiGet(`/api/patient/appointment/${phoneNumber}`);
+      const list = Array.isArray(res)
+        ? res
+        : Array.isArray(res?.appointments)
+        ? res.appointments
+        : [];
+      setData(list);
+    } catch (err) {
+      // Show friendly message on error
+      setError(err?.message || "Failed to load appointments. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  return (
+    <Card title="My Appointments">
+      {loading && <div className="text-sm text-gray-400 mb-2">Loading...</div>}
+      {error && <div className="text-sm text-red-400 mb-2">{error}</div>}
+      <Table
+        columns={columns}
+        data={data}
+        renderActions={(row) => (
+          <div className="flex gap-2">
+            {row?.receipt && (
+              <button
+                onClick={() => handleDownloadReceipt(row)}
+                className="px-2 py-1 bg-blue-600 hover:bg-blue-700 rounded"
+              >
+                Download Receipt
+              </button>
+            )}
+          </div>
+        )}
+      />
+    </Card>
+  );
+}
