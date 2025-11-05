@@ -1,41 +1,44 @@
 package com.hms.hospital_management_system.services;
+
 import com.hms.hospital_management_system.jpaRepository.DoctorRepository;
 import com.hms.hospital_management_system.jpaRepository.UserRepository;
 import com.hms.hospital_management_system.models.Doctor;
 import com.hms.hospital_management_system.models.User;
 import jakarta.transaction.Transactional;
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
 public class DoctorService {
-    
+
     @Autowired
     private DoctorRepository doctorRepository;
 
     @Autowired
     private UserRepository userRepository;
+
     public List<Doctor> getAllDoctors() {
         // logic to get all doctors
         try {
-           System.out.println("Getting all doctors");
-           return doctorRepository.findAll();
-        }catch(Exception e) {
-            System.out.println( "Error: " + e.getMessage());
+            System.out.println("Getting all doctors");
+            return doctorRepository.findAll();
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
         }
         return null;
     }
 
-    public Doctor createDoctor(Doctor doctor)  throws Exception{
+    public Doctor createDoctor(Doctor doctor) throws Exception {
         // logic to create a new doctor
         try {
             System.out.println("Successfully created a new doctor!!!");
             return doctorRepository.save(doctor);
-           
+
         } catch (Exception e) {
-            System.out.println( "Error: " + e.getMessage());
+            System.out.println("Error: " + e.getMessage());
             throw e;
         }
     }
@@ -72,26 +75,38 @@ public class DoctorService {
             return null;
         }
     }
+
     @Transactional
     public void deleteDoctor(Long doctorId) {
-    try {
-        // Fetch the user associated with the doctor
-        User user = userRepository.findByDoctorId(doctorId).orElseThrow(()-> new UsernameNotFoundException("User doesn't Exist"));
-        if (user == null) {
-            throw new UsernameNotFoundException("No user found for doctor ID: " + doctorId);
+        try {
+            // Fetch the user associated with the doctor
+            User user = userRepository.findByDoctorId(doctorId)
+                    .orElseThrow(() -> new UsernameNotFoundException("User doesn't Exist"));
+            if (user == null) {
+                throw new UsernameNotFoundException("No user found for doctor ID: " + doctorId);
+            }
+
+            // Delete the user record first (if required by DB constraints)
+            userRepository.deleteById(user.getId());
+
+            // Delete the doctor record
+            doctorRepository.deleteById(doctorId);
+
+        } catch (UsernameNotFoundException e) {
+            throw e; // rethrow specific error to handle in controller
+        } catch (Exception e) {
+            throw new RuntimeException(
+                    "Error deleting doctor with ID: " + doctorId + " — " + e.getMessage(), e);
         }
-
-        // Delete the user record first (if required by DB constraints)
-        userRepository.deleteById(user.getId());
-
-        // Delete the doctor record
-        doctorRepository.deleteById(doctorId);
-
-    } catch (UsernameNotFoundException e) {
-        throw e; // rethrow specific error to handle in controller
-    } catch (Exception e) {
-        throw new RuntimeException("Error deleting doctor with ID: " + doctorId + " — " + e.getMessage(), e);
     }
-}
+
+    public List<String> getAllSpecializations() {
+        try {
+            return doctorRepository.findDistinctSpecializations();
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+            return null;
+        }
+    }
 
 }

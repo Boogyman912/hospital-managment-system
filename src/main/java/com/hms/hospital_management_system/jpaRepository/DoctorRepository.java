@@ -10,4 +10,7 @@ public interface DoctorRepository extends JpaRepository<Doctor, Long> {
     
     @Query("SELECT d FROM Doctor d WHERE d.specialization = :specialization")
     List<Doctor> findBySpecialization(String specialization);
+
+    @Query("SELECT DISTINCT d.specialization FROM Doctor d")
+    List<String> findDistinctSpecializations();
 }
