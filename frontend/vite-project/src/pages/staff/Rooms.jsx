@@ -84,6 +84,7 @@ export default function Rooms() {
     } else {
       setFilteredData(data);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [statusFilter, typeFilter]);
 
   const handleCreate = () => {

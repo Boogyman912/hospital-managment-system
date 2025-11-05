@@ -11,7 +11,6 @@ export default function ManageInpatients() {
   const [admitModalOpen, setAdmitModalOpen] = useState(false);
   const [updateRoomModalOpen, setUpdateRoomModalOpen] = useState(false);
   const [selectedInpatient, setSelectedInpatient] = useState(null);
-  const [patients, setPatients] = useState([]);
   const [rooms, setRooms] = useState([]);
   const [formData, setFormData] = useState({
     patient: { patientId: "" },
@@ -62,15 +61,11 @@ export default function ManageInpatients() {
 
   const loadPatientsAndRooms = async () => {
     try {
-      // Try to get patients from staff endpoint, if not available, we'll handle it
-      const patientsRes = await apiGet("/api/staff/patients/all").catch(() => []);
-      setPatients(patientsRes || []);
-      
       // Get available rooms
       const roomsRes = await apiGet("/api/staff/rooms/status/AVAILABLE");
       setRooms(roomsRes || []);
     } catch (e) {
-      console.error("Failed to load patients/rooms:", e);
+      console.error("Failed to load rooms:", e);
     }
   };
 
