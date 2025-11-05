@@ -4,7 +4,12 @@ import Sidebar from "../components/dashboard/Sidebar.jsx";
 export default function StaffLayout() {
   const items = [
     { to: "/staff/dashboard", label: "Overview", icon: "home" },
-    { to: "/staff/rooms", label: "Rooms", icon: "clipboard" },
+    { to: "/staff/rooms", label: "Manage Rooms", icon: "clipboard" },
+    { to: "/staff/inpatients", label: "Inpatients", icon: "users" },
+    { to: "/staff/inventory", label: "Inventory", icon: "package" },
+    { to: "/staff/labtests", label: "Lab Tests", icon: "microscope" },
+    { to: "/staff/billing", label: "Billing", icon: "dollar-sign" },
+    { to: "/staff/patients", label: "Patients", icon: "user" },
   ];
 
   return (

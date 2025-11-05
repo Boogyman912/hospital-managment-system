@@ -38,7 +38,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Public endpoints
                         .requestMatchers("/api/home/**").permitAll()
-                        .requestMatchers("/api/auth/**").permitAll()  
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/patient/**").permitAll()
                         // Admin endpoints
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
 

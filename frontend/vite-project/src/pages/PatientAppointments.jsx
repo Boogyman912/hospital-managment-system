@@ -1,270 +1,226 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState, useCallback } from "react";
+import Card from "../components/ui/Card.jsx";
+import Table from "../components/ui/Table.jsx";
 import Header from "../components/Header.jsx";
 import Footer from "../components/Footer.jsx";
 import { apiGet } from "../api.js";
 
+const handleDownloadReceipt = (appointment) => {
+  if (!appointment) return;
+
+  // Check if PDF URL exists from backend and use it directly
+  if (appointment.receipt?.pdfUrl) {
+    window.open(appointment.receipt.pdfUrl, "_blank");
+    return;
+  }
+
+  // Fallback to HTML print functionality for cases where pdfUrl is not available
+  const receiptData = {
+    appointmentId: appointment.appointmentId,
+    doctorName: appointment.doctor?.name || "N/A",
+    doctorSpecialization: appointment.doctor?.specialization || "N/A",
+    patientName: appointment.patient?.name || "N/A",
+    patientPhone: appointment.patient?.phoneNumber || "N/A",
+    slotDate: appointment.slot?.date || "N/A",
+    slotTime: appointment.slot?.time || "N/A",
+    appointmentType: appointment.isOnline ? "Online" : "In-person",
+    amount: appointment.receipt?.amount || "N/A",
+    paymentMethod: appointment.receipt?.paymentMethod || "N/A",
+    timestamp: appointment.receipt?.timestamp || new Date().toISOString(),
+  };
+
+  // Create a professional HTML receipt
+  const receiptHTML = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Receipt - ${receiptData.appointmentId}</title>
+      <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 20px; }
+        .receipt-details { margin: 20px 0; }
+        .receipt-details div { margin: 10px 0; }
+        .total { font-weight: bold; font-size: 18px; border-top: 1px solid #333; padding-top: 10px; margin-top: 20px; }
+        .footer { text-align: center; margin-top: 30px; font-size: 12px; color: #666; }
+      </style>
+    </head>
+    <body>
+      <div class="header">
+        <h1>Hospital Management System</h1>
+        <h2>Appointment Receipt</h2>
+      </div>
+      
+      <div class="receipt-details">
+        <div><strong>Appointment ID:</strong> ${receiptData.appointmentId}</div>
+        <div><strong>Date:</strong> ${new Date(receiptData.timestamp).toLocaleDateString()}</div>
+        <div><strong>Time:</strong> ${new Date(receiptData.timestamp).toLocaleTimeString()}</div>
+        <div><strong>Patient Name:</strong> ${receiptData.patientName}</div>
+        <div><strong>Patient Phone:</strong> ${receiptData.patientPhone}</div>
+        <div><strong>Doctor:</strong> ${receiptData.doctorName}</div>
+        <div><strong>Specialization:</strong> ${receiptData.doctorSpecialization}</div>
+        <div><strong>Appointment Date:</strong> ${receiptData.slotDate}</div>
+        <div><strong>Appointment Time:</strong> ${receiptData.slotTime}</div>
+        <div><strong>Appointment Type:</strong> ${receiptData.appointmentType}</div>
+        <div><strong>Payment Method:</strong> ${receiptData.paymentMethod}</div>
+      </div>
+      
+      <div class="total">
+        <div>Total Amount: ₹${receiptData.amount}</div>
+      </div>
+      
+      <div class="footer">
+        <p>Thank you for choosing our hospital!</p>
+        <p>For any queries, please contact us.</p>
+      </div>
+    </body>
+    </html>
+  `;
+
+  // Create a new window with the receipt content
+  const printWindow = window.open("", "_blank");
+  printWindow.document.write(receiptHTML);
+  printWindow.document.close();
+
+  // Wait for content to load, then trigger print dialog
+  printWindow.onload = function () {
+    printWindow.print();
+  };
+};
+
 export default function PatientAppointments() {
-  const navigate = useNavigate();
-  const [phoneNumber, setPhoneNumber] = useState("");
   const [loading, setLoading] = useState(false);
-  const [appointments, setAppointments] = useState([]);
   const [error, setError] = useState("");
+  const [data, setData] = useState([]);
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [hasSearched, setHasSearched] = useState(false);
 
-  const handleSearch = async (e) => {
-    e.preventDefault();
-    if (!phoneNumber.trim()) return;
+  // Helper function to sanitize phone number input
+  const sanitizePhoneNumber = (value) => value.replace(/\D/g, '');
+
+  const columns = [
+    {
+      key: "slot",
+      header: "Date",
+      render: (slot) => (slot?.date ? slot.date : "-"),
+    },
+    {
+      key: "slot",
+      header: "Time",
+      render: (slot) => (slot?.time ? slot.time : "-"),
+    },
+    {
+      key: "doctor",
+      header: "Doctor",
+      render: (doctor) =>
+        doctor ? `${doctor.name} (${doctor.specialization})` : "N/A",
+    },
+    { key: "appointmentStatus", header: "Status" },
+    { key: "paymentStatus", header: "Payment" },
+  ];
+
+  const load = useCallback(async () => {
+    if (!phoneNumber) {
+      setError("Please enter a phone number.");
+      return;
+    }
+
+    // Validate phone number format (10-15 digits)
+    if (!/^\d{10,15}$/.test(phoneNumber)) {
+      setError("Please enter a valid phone number (10-15 digits).");
+      return;
+    }
 
     setLoading(true);
     setError("");
-    setAppointments([]);
     setHasSearched(true);
-
     try {
-      const response = await apiGet(`/api/home/appointment/${phoneNumber}`);
-
-      if (response.success === false) {
-        setError(response.message || "No appointments found");
-        setAppointments([]);
-      } else if (
-        response.success === true &&
-        Array.isArray(response.appointments)
-      ) {
-        setAppointments(response.appointments);
-        setError("");
-      } else {
-        setError("Invalid response format");
-        setAppointments([]);
+      const res = await apiGet(`/api/patient/appointment/${phoneNumber}`);
+      const list = Array.isArray(res)
+        ? res
+        : Array.isArray(res?.appointments)
+        ? res.appointments
+        : [];
+      setData(list);
+      
+      if (list.length === 0) {
+        setError("No appointments found for this phone number.");
       }
     } catch (err) {
-      setError(err.message || "Failed to fetch appointments");
-      setAppointments([]);
+      // Show friendly message on error
+      setError(err?.message || "Failed to load appointments. Please try again later.");
+      setData([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, [phoneNumber]);
 
-  const handleDownloadReceipt = (receipt) => {
-    if (!receipt) return;
-
-    const receiptData = {
-      appointmentId: receipt.appointmentId,
-      doctorName: receipt.doctor?.name,
-      doctorSpecialization: receipt.doctor?.specialization,
-      patientName: receipt.patient?.name,
-      patientPhone: receipt.patient?.phoneNumber,
-      slotTiming: `${receipt.slot?.startTime} - ${receipt.slot?.endTime}`,
-      amount: receipt.receipt?.amount,
-      paymentMethod: receipt.receipt?.paymentMethod,
-      timestamp: receipt.receipt?.timestamp,
-    };
-
-    const dataStr = JSON.stringify(receiptData, null, 2);
-    const dataUri =
-      "data:application/json;charset=utf-8," + encodeURIComponent(dataStr);
-
-    const exportFileDefaultName = `receipt-${receipt.appointmentId}.json`;
-
-    const linkElement = document.createElement("a");
-    linkElement.setAttribute("href", dataUri);
-    linkElement.setAttribute("download", exportFileDefaultName);
-    linkElement.click();
-  };
-
-  const formatDateTime = (dateTimeString) => {
-    if (!dateTimeString) return "N/A";
+  useEffect(() => {
+    // Try to get phone number from localStorage if user is logged in
     try {
-      const date = new Date(dateTimeString);
-      return date.toLocaleString();
+      const user = JSON.parse(localStorage.getItem("user") || "{}");
+      if (user.phoneNumber) {
+        setPhoneNumber(user.phoneNumber);
+      }
     } catch {
-      return dateTimeString;
+      // Ignore parse errors
     }
-  };
-
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "PAID":
-        return "text-green-400";
-      case "PENDING":
-        return "text-yellow-400";
-      case "CANCELLED":
-        return "text-red-400";
-      default:
-        return "text-gray-400";
-    }
-  };
+  }, []);
 
   return (
-    <div className="bg-gray-900 min-h-screen flex flex-col">
+    <div className="min-h-screen bg-gray-900 flex flex-col">
       <Header />
-      <div className="flex-1 px-4 sm:px-8 py-8">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl sm:text-5xl font-bold text-white text-center mb-10">
-            My Appointments
-          </h1>
-
-          {/* Search Form */}
-          <div className="bg-gray-800 rounded-xl p-6 mb-8">
-            <form onSubmit={handleSearch} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Phone Number
-                </label>
-                <input
-                  type="tel"
-                  value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value)}
-                  placeholder="Enter your phone number"
-                  required
-                  className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
+      <div className="flex-1 flex items-center justify-center p-4">
+        <div className="w-full max-w-4xl">
+          <div className="bg-gray-800 border border-gray-700 rounded-lg p-6 mb-4">
+            <h1 className="text-2xl font-semibold mb-4 text-white">My Appointments</h1>
+            <p className="text-gray-400 mb-4">Enter your phone number to view your appointments</p>
+            
+            <div className="flex gap-2">
+              <input
+                type="tel"
+                className="flex-1 px-3 py-2 bg-gray-900 border border-gray-700 rounded text-white"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(sanitizePhoneNumber(e.target.value))}
+                placeholder="Enter phone number (10-15 digits)"
+                maxLength="15"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    load();
+                  }
+                }}
+              />
               <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-300"
+                onClick={load}
+                disabled={loading || !phoneNumber}
+                className="px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed rounded font-medium text-white"
               >
-                {loading ? "Searching..." : "Search Appointments"}
+                {loading ? "Loading..." : "Search"}
               </button>
-            </form>
+            </div>
+            
+            {error && <div className="mt-3 text-red-400 text-sm">{error}</div>}
           </div>
 
-          {/* Error Message */}
-          {error && (
-            <div className="bg-red-900/20 border border-red-500 rounded-lg p-4 mb-6">
-              <p className="text-red-400 text-center">{error}</p>
-            </div>
-          )}
-
-          {/* Appointments List */}
-          {hasSearched && !loading && appointments.length === 0 && !error && (
-            <div className="bg-gray-800 rounded-xl p-6 text-center">
-              <p className="text-gray-400">
-                No appointments found for this phone number.
-              </p>
-            </div>
-          )}
-
-          {appointments.length > 0 && (
-            <div className="space-y-6">
-              <h2 className="text-2xl font-bold text-white mb-4">
-                Your Appointments ({appointments.length})
-              </h2>
-
-              {appointments.map((appointment) => (
-                <div
-                  key={appointment.appointmentId}
-                  className="bg-gray-800 rounded-xl p-6"
-                >
-                  <div className="grid md:grid-cols-2 gap-6">
-                    {/* Appointment Info */}
-                    <div className="space-y-4">
-                      <div>
-                        <h3 className="text-lg font-semibold text-white mb-2">
-                          Appointment #{appointment.appointmentId}
-                        </h3>
-                        <div className="space-y-2 text-sm">
-                          <p className="text-gray-300">
-                            <span className="font-medium">Status:</span>{" "}
-                            <span
-                              className={getStatusColor(
-                                appointment.paymentStatus
-                              )}
-                            >
-                              {appointment.paymentStatus}
-                            </span>
-                          </p>
-                          <p className="text-gray-300">
-                            <span className="font-medium">Booking Time:</span>{" "}
-                            {formatDateTime(appointment.bookingTime)}
-                          </p>
-                          <p className="text-gray-300">
-                            <span className="font-medium">Type:</span>{" "}
-                            {appointment.isOnline ? "Online" : "In-person"}
-                          </p>
-                          {appointment.meetLink && (
-                            <p className="text-gray-300">
-                              <span className="font-medium">Meet Link:</span>{" "}
-                              <a
-                                href={appointment.meetLink}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-blue-400 hover:text-blue-300"
-                              >
-                                Join Meeting
-                              </a>
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Doctor Info */}
-                    <div className="space-y-4">
-                      <div>
-                        <h4 className="text-md font-semibold text-white mb-2">
-                          Doctor Details
-                        </h4>
-                        <div className="space-y-2 text-sm">
-                          <p className="text-gray-300">
-                            <span className="font-medium">Name:</span>{" "}
-                            {appointment.doctor?.name}
-                          </p>
-                          <p className="text-gray-300">
-                            <span className="font-medium">Specialization:</span>{" "}
-                            {appointment.doctor?.specialization}
-                          </p>
-                          <p className="text-gray-300">
-                            <span className="font-medium">Contact:</span>{" "}
-                            {appointment.doctor?.phone_number}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div>
-                        <h4 className="text-md font-semibold text-white mb-2">
-                          Slot Details
-                        </h4>
-                        <div className="space-y-2 text-sm">
-                          <p className="text-gray-300">
-                            <span className="font-medium">Date:</span>{" "}
-                            {appointment.slot?.date || "N/A"}
-                          </p>
-                          <p className="text-gray-300">
-                            <span className="font-medium">Time:</span>{" "}
-                            {appointment.slot?.time || "N/A"}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Receipt Download */}
-                  {appointment.receipt && (
-                    <div className="mt-6 pt-4 border-t border-gray-700">
+          {hasSearched && !loading && (
+            <Card title={`Appointments for ${phoneNumber}`}>
+              <Table
+                columns={columns}
+                data={data}
+                renderActions={(row) => (
+                  <div className="flex gap-2">
+                    {row?.receipt && (
                       <button
-                        onClick={() => handleDownloadReceipt(appointment)}
-                        className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-300"
+                        onClick={() => handleDownloadReceipt(row)}
+                        className="px-2 py-1 bg-blue-600 hover:bg-blue-700 rounded"
                       >
                         Download Receipt
                       </button>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
+                    )}
+                  </div>
+                )}
+              />
+            </Card>
           )}
-
-          {/* Back Button */}
-          <div className="mt-8 text-center">
-            <button
-              onClick={() => navigate("/doctors")}
-              className="bg-gray-700 hover:bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-300"
-            >
-              Back to Doctors
-            </button>
-          </div>
         </div>
       </div>
       <Footer />
