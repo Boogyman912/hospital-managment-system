@@ -34,7 +34,7 @@ export default function Rooms() {
     { 
       key: "pricePerDay", 
       header: "Price Per Day",
-      render: (val) => val ? `$${val.toFixed(2)}` : "N/A"
+      render: (val) => val ? `₹${val.toFixed(2)}` : "N/A"
     },
   ];
 
