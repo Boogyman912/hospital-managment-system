@@ -200,6 +200,12 @@ public ResponseEntity<?> getAppointmentByPhoneNumber(@PathVariable String phoneN
         return ResponseEntity.notFound().build();
     }
 
+    @GetMapping("/doctors/specializations")
+    public ResponseEntity<List<String>> getAllSpecializations() {
+        List<String> specializations = doctorService.getAllSpecializations();
+        return ResponseEntity.ok(specializations);
+    }
+
     @GetMapping("/doctors/specialization/{specialization}")
     public ResponseEntity<List<Doctor>> getDoctorsBySpecialization(
             @PathVariable String specialization) {
