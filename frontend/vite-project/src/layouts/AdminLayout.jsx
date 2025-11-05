@@ -8,6 +8,12 @@ export default function AdminLayout() {
     { to: "/admin/staff", label: "Staff", icon: "users" },
     { to: "/admin/appointments", label: "Appointments", icon: "calendar" },
     { to: "/admin/feedbacks", label: "Feedbacks", icon: "feedback" },
+    { to: "/admin/rooms", label: "Manage Rooms", icon: "clipboard" },
+    { to: "/admin/inpatients", label: "Inpatients", icon: "users" },
+    { to: "/admin/inventory", label: "Inventory", icon: "package" },
+    { to: "/admin/labtests", label: "Lab Tests", icon: "microscope" },
+    { to: "/admin/billing", label: "Billing", icon: "dollar-sign" },
+    { to: "/admin/patients", label: "Patients", icon: "user" },
   ];
 
   return (

@@ -24,6 +24,11 @@ import Slots from "./pages/doctor/Slots.jsx";
 import DoctorFeedbacks from "./pages/doctor/Feedbacks.jsx";
 import StaffDashboard from "./pages/staff/StaffDashboard.jsx";
 import Rooms from "./pages/staff/Rooms.jsx";
+import ManageInpatients from "./pages/staff/ManageInpatients.jsx";
+import ManageInventory from "./pages/staff/ManageInventory.jsx";
+import ManageLabTests from "./pages/staff/ManageLabTests.jsx";
+import ManageBilling from "./pages/staff/ManageBilling.jsx";
+import ManagePatients from "./pages/staff/ManagePatients.jsx";
 import PaymentPage from "./pages/PaymentPage.jsx";
 import PatientAppointments from "./pages/PatientAppointments.jsx";
 
@@ -49,6 +54,12 @@ function AppWithAuth() {
             { path: "/admin/staff", element: <StaffManagement /> },
             { path: "/admin/appointments", element: <AdminAppointments /> },
             { path: "/admin/feedbacks", element: <AdminFeedbacks /> },
+            { path: "/admin/rooms", element: <Rooms /> },
+            { path: "/admin/inpatients", element: <ManageInpatients /> },
+            { path: "/admin/inventory", element: <ManageInventory /> },
+            { path: "/admin/labtests", element: <ManageLabTests /> },
+            { path: "/admin/billing", element: <ManageBilling /> },
+            { path: "/admin/patients", element: <ManagePatients /> },
           ],
         },
       ],
@@ -78,6 +89,11 @@ function AppWithAuth() {
           children: [
             { path: "/staff/dashboard", element: <StaffDashboard /> },
             { path: "/staff/rooms", element: <Rooms /> },
+            { path: "/staff/inpatients", element: <ManageInpatients /> },
+            { path: "/staff/inventory", element: <ManageInventory /> },
+            { path: "/staff/labtests", element: <ManageLabTests /> },
+            { path: "/staff/billing", element: <ManageBilling /> },
+            { path: "/staff/patients", element: <ManagePatients /> },
           ],
         },
       ],
