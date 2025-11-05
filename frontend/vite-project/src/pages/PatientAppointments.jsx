@@ -183,7 +183,7 @@ export default function PatientAppointments() {
                 onChange={(e) => setPhoneNumber(sanitizePhoneNumber(e.target.value))}
                 placeholder="Enter phone number (10-15 digits)"
                 maxLength="15"
-                onKeyPress={(e) => {
+                onKeyDown={(e) => {
                   if (e.key === "Enter") {
                     load();
                   }
