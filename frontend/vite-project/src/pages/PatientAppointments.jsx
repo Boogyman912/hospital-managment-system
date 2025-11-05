@@ -121,6 +121,12 @@ export default function PatientAppointments() {
       return;
     }
 
+    // Validate phone number format (10-15 digits)
+    if (!/^\d{10,15}$/.test(phoneNumber)) {
+      setError("Please enter a valid phone number (10-15 digits).");
+      return;
+    }
+
     setLoading(true);
     setError("");
     setHasSearched(true);
@@ -171,8 +177,9 @@ export default function PatientAppointments() {
                 type="tel"
                 className="flex-1 px-3 py-2 bg-gray-900 border border-gray-700 rounded text-white"
                 value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                placeholder="Enter phone number"
+                onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ''))}
+                placeholder="Enter phone number (10-15 digits)"
+                maxLength="15"
                 onKeyPress={(e) => {
                   if (e.key === "Enter") {
                     load();

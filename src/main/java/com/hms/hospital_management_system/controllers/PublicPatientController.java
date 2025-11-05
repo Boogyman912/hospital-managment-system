@@ -18,14 +18,19 @@ public class PublicPatientController {
     @GetMapping("/appointment/{phoneNumber}")
     public ResponseEntity<?> getAppointmentByPhoneNumber(@PathVariable String phoneNumber) {
         try {
-            System.out.println("Fetching Appointments for: " + phoneNumber);
+            // Validate phone number format (basic validation)
+            if (phoneNumber == null || phoneNumber.trim().isEmpty() || !phoneNumber.matches("\\d{10,15}")) {
+                return ResponseEntity.badRequest().body(Map.of(
+                    "success", false,
+                    "message", "Invalid phone number format"
+                ));
+            }
 
             // Fetch appointments from the service
             List<Appointment> appointments = appointmentService.findByPhoneNumber(phoneNumber);
 
             // Filter only the ones that are not completed (status = BOOKED)
             List<Appointment> incompleteAppointments = new ArrayList<>();
-            System.out.println(appointments.size());
             for (Appointment appointment : appointments) {
                 if (appointment.getAppointmentStatus() == AppointmentStatus.BOOKED) {
                     incompleteAppointments.add(appointment);
@@ -36,7 +41,7 @@ public class PublicPatientController {
             if (incompleteAppointments.isEmpty()) {
                 return ResponseEntity.status(404).body(Map.of(
                     "success", false,
-                    "message", "No appointments found for phone number: " + phoneNumber
+                    "message", "No appointments found"
                 ));
             }
 
@@ -47,10 +52,10 @@ public class PublicPatientController {
             ));
 
         } catch (Exception e) {
-            // Handle any unexpected errors
+            // Handle any unexpected errors - don't expose internal details
             return ResponseEntity.status(500).body(Map.of(
                 "success", false,
-                "message", "Error retrieving appointments: " + e.getMessage()
+                "message", "Error retrieving appointments. Please try again later."
             ));
         }
     }
