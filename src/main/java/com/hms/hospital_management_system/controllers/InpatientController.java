@@ -2,9 +2,13 @@ package com.hms.hospital_management_system.controllers;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import java.time.LocalDate;
 import java.util.*;
+import com.hms.hospital_management_system.dto.admitPatientRequest;
 import com.hms.hospital_management_system.models.Inpatient;
 import com.hms.hospital_management_system.services.InpatientService;
+import com.hms.hospital_management_system.services.PatientService;
+import com.hms.hospital_management_system.services.RoomService;
 
 
 @RestController
@@ -13,6 +17,10 @@ public class InpatientController {
 
     @Autowired
     private InpatientService inpatientService;
+    @Autowired 
+    private PatientService patientService;
+    @Autowired 
+    private RoomService roomService;
 
     @GetMapping("/all")
     public ResponseEntity<List<Inpatient>> getAllInpatients() {
@@ -59,8 +67,16 @@ public class InpatientController {
     }
 
     @PostMapping("/admit")
-    public ResponseEntity<Inpatient> admitPatient(@RequestBody Inpatient inpatient) throws RuntimeException {
+    public ResponseEntity<Inpatient> admitPatient(@RequestBody admitPatientRequest req) throws RuntimeException {
         try {
+            String patientPhoneNumber = req.getPatientPhoneNumber();
+            Long roomId = req.getRoomId();
+            Inpatient inpatient = new Inpatient();
+            inpatient.setPatient(patientService.findByPhoneNumber(patientPhoneNumber).orElseThrow(() -> new RuntimeException("Patient not found")));
+            inpatient.setRoom(roomService.getRoomById(roomId).orElseThrow(() -> new RuntimeException("Room not found")));
+            inpatient.setAdmissionDate(LocalDate.now());
+            inpatient.setDischargeDate(null);
+            inpatient.setIsBilled(false);
             Inpatient admittedInpatient = inpatientService.admitPatient(inpatient);
             return ResponseEntity.ok(admittedInpatient);
         } catch (Exception e) {

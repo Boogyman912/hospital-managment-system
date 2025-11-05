@@ -1,13 +1,13 @@
 package com.hms.hospital_management_system.controllers;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import com.hms.hospital_management_system.services.RoomService;
 import com.hms.hospital_management_system.models.Room;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import java.util.*;
 import org.springframework.web.bind.annotation.*;
+
 @RestController
 @RequestMapping("/api/staff/rooms")
 public class RoomController {
@@ -29,25 +29,36 @@ public class RoomController {
 
     @GetMapping("/type/{type}")
     public ResponseEntity<List<Room>> getRoomsByType(@PathVariable String type) {
+        
         List<Room> rooms = roomService.getRoomsByType(type);
         return ResponseEntity.ok(rooms);
     }
+
     @GetMapping("/type/{type}/status/{status}")
-    public ResponseEntity<List<Room>> getRoomsByTypeAndStatus(@PathVariable String type, @PathVariable String status) {
+    public ResponseEntity<List<Room>> getRoomsByTypeAndStatus(@PathVariable String type,
+            @PathVariable String status) {
         List<Room> rooms = roomService.getRoomsByTypeAndStatus(type, status);
         return ResponseEntity.ok(rooms);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Room> getRoomById(@PathVariable Long id) {
-        Room room = roomService.getRoomById(id);
-        if (room != null) {
-            return ResponseEntity.ok(room);
-        } else {
-            return ResponseEntity.notFound().build();
+        try {
+            Optional<Room> optionalRoom = roomService.getRoomById(id);
+
+            if (optionalRoom.isPresent()) {
+                return ResponseEntity.ok(optionalRoom.get());
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); // or
+                                                                               // ResponseEntity.notFound().build()
+            }
+        } catch (Exception e) {
+            // Log the exception if needed (using a logger)
+            System.err.println("Error while fetching room by ID: " + e.getMessage());
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
-
 
 
 
@@ -62,7 +73,8 @@ public class RoomController {
     }
 
     @PatchMapping("/update/{id}/status/{status}")
-    public ResponseEntity<Room> updateRoomStatus(@PathVariable Long id, @PathVariable String status) {
+    public ResponseEntity<Room> updateRoomStatus(@PathVariable Long id,
+            @PathVariable String status) {
         Room updatedRoom = roomService.updateRoomStatus(id, status);
         if (updatedRoom != null) {
             return ResponseEntity.ok(updatedRoom);
@@ -92,7 +104,5 @@ public class RoomController {
     }
 
 
-
-    
 
 }

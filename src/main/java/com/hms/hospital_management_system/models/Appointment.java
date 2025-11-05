@@ -36,13 +36,13 @@ public class Appointment {
     private String paymentStatus;
 
     @Enumerated(EnumType.STRING)
-    private AppointmentStatus appointmentStatus;
+    private AppointmentStatus appointmentStatus; // = AppointmentStatus.BOOKED;
 
     private Boolean isOnline;
 
     private String meetLink;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "receipt_id")
     private Receipt receipt;
 

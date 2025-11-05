@@ -127,7 +127,7 @@ public class BillingService {
     }
 
     public Billing getBillByPrescriptionId(Long prescriptionId) {
-        return billingRepository.findBillByPrescriptionId(prescriptionId);
+        return billingRepository.findBillByPrescriptionId(prescriptionId);  
     }
 
     public List<Billing> getAllBills() {
