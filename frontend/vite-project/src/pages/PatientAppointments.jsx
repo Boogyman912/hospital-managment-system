@@ -94,6 +94,9 @@ export default function PatientAppointments() {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [hasSearched, setHasSearched] = useState(false);
 
+  // Helper function to sanitize phone number input
+  const sanitizePhoneNumber = (value) => value.replace(/\D/g, '');
+
   const columns = [
     {
       key: "slot",
@@ -177,7 +180,7 @@ export default function PatientAppointments() {
                 type="tel"
                 className="flex-1 px-3 py-2 bg-gray-900 border border-gray-700 rounded text-white"
                 value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ''))}
+                onChange={(e) => setPhoneNumber(sanitizePhoneNumber(e.target.value))}
                 placeholder="Enter phone number (10-15 digits)"
                 maxLength="15"
                 onKeyPress={(e) => {

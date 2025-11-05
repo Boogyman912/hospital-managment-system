@@ -7,6 +7,7 @@ import com.hms.hospital_management_system.models.Appointment.AppointmentStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.hms.hospital_management_system.services.AppointmentService;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/patient")
@@ -30,12 +31,9 @@ public class PublicPatientController {
             List<Appointment> appointments = appointmentService.findByPhoneNumber(phoneNumber);
 
             // Filter only the ones that are not completed (status = BOOKED)
-            List<Appointment> incompleteAppointments = new ArrayList<>();
-            for (Appointment appointment : appointments) {
-                if (appointment.getAppointmentStatus() == AppointmentStatus.BOOKED) {
-                    incompleteAppointments.add(appointment);
-                }
-            }
+            List<Appointment> incompleteAppointments = appointments.stream()
+                .filter(appointment -> appointment.getAppointmentStatus() == AppointmentStatus.BOOKED)
+                .collect(Collectors.toList());
 
             // If no appointments found, return 404 response
             if (incompleteAppointments.isEmpty()) {
