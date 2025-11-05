@@ -39,7 +39,6 @@ export default function DoctorAppointments() {
 
   // Cleanup on unmount
   useEffect(() => {
-    isMountedRef.current = true;
     return () => {
       isMountedRef.current = false;
       if (timeoutRef.current) {
