@@ -75,6 +75,8 @@ public class InpatientController {
             String patientPhoneNumber = req.getPatientPhoneNumber();
             Long roomId = req.getRoomId();
             Inpatient inpatient = new Inpatient();
+            System.out.println("Admitting patient with phone number: " + patientPhoneNumber);
+            System.out.println("To room ID: " + roomId);
             inpatient.setPatient(patientService.findByPhoneNumber(patientPhoneNumber)
                     .orElseThrow(() -> new RuntimeException("Patient not found")));
             inpatient.setRoom(roomService.getRoomById(roomId)

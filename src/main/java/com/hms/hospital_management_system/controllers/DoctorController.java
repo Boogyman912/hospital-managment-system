@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import com.hms.hospital_management_system.models.Appointment;
 import com.hms.hospital_management_system.models.Doctor;
 import com.hms.hospital_management_system.models.Inventory;
+import com.hms.hospital_management_system.models.LabTest;
 import com.hms.hospital_management_system.models.Slot;
 // import com.hms.hospital_management_system.models.Doctor;
 import com.hms.hospital_management_system.models.Prescription;
@@ -32,6 +33,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import com.hms.hospital_management_system.dto.FeedbackDTO;
 import com.hms.hospital_management_system.jpaRepository.UserRepository;
 import com.hms.hospital_management_system.services.DoctorService;
+import com.hms.hospital_management_system.services.LabTestService;
 
 @RestController
 @RequestMapping("/api/doctor")
@@ -57,6 +59,8 @@ public class DoctorController {
         private DoctorService doctorService;
         @Autowired
         private InventoryService inventoryService;
+        @Autowired
+        private LabTestService labTestService;
 
         // Doctor can only see their appointments
         @GetMapping("/appointments")
@@ -73,15 +77,21 @@ public class DoctorController {
                                 appointmentService.getAppointmentsByDoctorId(doctorId);
                 return ResponseEntity.ok(appointments);
         }
-         @GetMapping("/allinventory")
-    public ResponseEntity<List<Inventory>> getAllInventory() {
-        try {
-            List<Inventory> inventory = inventoryService.getAllInventory();
-            return ResponseEntity.ok(inventory);
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
+
+        @GetMapping("/allinventory")
+        public ResponseEntity<List<Inventory>> getAllInventory() {
+                try {
+                        List<Inventory> inventory = inventoryService.getAllInventory();
+                        return ResponseEntity.ok(inventory);
+                } catch (Exception e) {
+                        return ResponseEntity.internalServerError().build();
+                }
         }
-    }
+
+        @GetMapping("/alllabtests")
+        public ResponseEntity<List<LabTest>> testLabTestController() {
+                return ResponseEntity.ok(labTestService.getAllLabTests());
+        }
 
         @GetMapping("/feedbacks")
         public ResponseEntity<List<FeedbackDTO>> getFeedbacksByDoctorId(Authentication auth)

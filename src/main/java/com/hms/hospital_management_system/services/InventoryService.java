@@ -24,7 +24,30 @@ public class InventoryService {
     }
     
     public Inventory updateInventory(Long id, Inventory inventory) {
-        return inventoryRepository.save(inventory);
+        Inventory existingInventory = inventoryRepository.findById(id).orElse(null);
+        if (existingInventory == null) {
+            //throw exception
+            throw new RuntimeException("Inventory not found with id " + id);
+        }
+
+        //update existing inventory with input inventory details
+        if(!inventory.getItemName().isEmpty()){
+            existingInventory.setItemName(inventory.getItemName());
+        }
+        if(!inventory.getBrandName().isEmpty()){
+            existingInventory.setBrandName(inventory.getBrandName());
+        }
+        if(inventory.getQuantity() != null){
+            existingInventory.setQuantity(inventory.getQuantity());
+        }
+        if(inventory.getUnitPrice() != null){
+            existingInventory.setUnitPrice(inventory.getUnitPrice());
+        }
+        if(inventory.getLastRestocked() != null){
+            existingInventory.setLastRestocked(inventory.getLastRestocked());
+        }
+
+        return inventoryRepository.save(existingInventory);
     }
     
     public void deleteInventory(Long id) {
